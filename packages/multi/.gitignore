@@ -1,0 +1,11 @@
+
+*.data
+
+.DS_Store
+
+node_modules
+
+.env
+
+example/example.db
+nedb/nedb-multi/file

@@ -1,0 +1,55 @@
+{
+  "name": "root",
+  "private": true,
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "author": {
+    "name": "wangshijun",
+    "email": "shijun@arcblock.io",
+    "url": "https://github.com/wangshijun"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "6.8.0",
+    "eslint-config-airbnb": "18.1.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.0",
+    "eslint-config-prettier": "latest",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-prettier": "latest",
+    "husky": "^4.2.3",
+    "jsdoc": "^3.6.3",
+    "lerna": "^3.22.1",
+    "lint-staged": "^10.1.1",
+    "prettier": "^2.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ArcBlock/abt-node.git"
+  },
+  "lint-staged": {
+    "*.{js,jsx,mjs,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{css,less,scss,json,graphql}": [
+      "prettier --write"
+    ]
+  },
+  "scripts": {
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "build": "lerna run clean && lerna run build",
+    "clean": "lerna clean",
+    "test": "CI=1 lerna run test",
+    "coverage": "CI=1 lerna run coverage"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && lerna run precommit",
+      "pre-push": "lint-staged && lerna run prepush"
+    }
+  }
+}

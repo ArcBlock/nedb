@@ -1,0 +1,40 @@
+{
+  "name": "@nedb/multi",
+  "author": "Vladimir Angelov, wangshijun",
+  "files": [
+    "lib",
+    "example",
+    "index.js",
+    "server.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "1.0.32",
+  "description": "A proxy for nedb which allows for multi-process access",
+  "scripts": {
+    "precommit": "npm run test",
+    "prepush": "npm run test",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "tape test/unit/**.js",
+    "test:integration": "NEDB_MULTI_INTERATIONS=10 NEDB_MULTI_PORT=5151 node test/integration/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArcBlock/abt-node"
+  },
+  "keywords": [
+    "nedb"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@nedb/core": "^1.0.32",
+    "axon": "^2.0.3",
+    "errio": "^1.2.2"
+  },
+  "devDependencies": {
+    "faucet": "0.0.1",
+    "proxyquire": "^1.7.11",
+    "tape": "^4.6.3"
+  }
+}

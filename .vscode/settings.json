@@ -1,0 +1,13 @@
+{
+  "search.exclude": {
+    "**/*.js.map": true,
+    "core/webapp/blocklet.js": true,
+    "core/webapp/.blocklet": true,
+    "**/dist/": true,
+    "**/build/": true,
+    "**/*.chunk.js": true
+  },
+  "editor.formatOnSave": true,
+  "eslint.format.enable": true,
+  "prettier.enable": true
+}

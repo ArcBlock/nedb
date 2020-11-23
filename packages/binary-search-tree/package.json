@@ -1,0 +1,35 @@
+{
+  "name": "@nedb/binary-search-tree",
+  "version": "1.0.32",
+  "files": [
+    "lib",
+    "index.js"
+  ],
+  "description": "Different binary search tree implementations, including a self-balancing one (AVL)",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "AVL tree",
+    "binary search tree",
+    "self-balancing",
+    "AVL tree"
+  ],
+  "homepage": "https://github.com/ArcBlock/abt-node",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ArcBlock/abt-node.git"
+  },
+  "devDependencies": {
+    "chai": "1.0.x",
+    "mocha": "1.4.x",
+    "underscore": "~1.4.4"
+  },
+  "scripts": {
+    "precommit": "npm run test",
+    "prepush": "npm run test",
+    "test": "make test"
+  },
+  "main": "index",
+  "licence": "MIT"
+}

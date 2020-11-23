@@ -1,0 +1,111 @@
+/* eslint-disable prefer-rest-params */
+/* eslint-disable prefer-spread */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable func-names */
+/**
+ * Responsible for sequentially executing actions on the database
+ */
+
+const AsyncQueue = require('async/queue');
+
+// eslint-disable-next-line global-require
+// const debug = require('debug')(`${require('../package.json').name}:executor`);
+
+function Executor() {
+  this.buffer = [];
+  this.ready = false;
+  this.open = true;
+
+  // This queue will execute all commands, one-by-one in order
+  this.queue = AsyncQueue((task, cb) => {
+    // task.arguments is an array-like object on which adding a new field doesn't work, so we transform it into a real array
+    const newArguments = [...task.arguments];
+    const lastArg = task.arguments[task.arguments.length - 1];
+
+    // Always tell the queue task is complete. Execute callback if any was given.
+    if (typeof lastArg === 'function') {
+      // Callback was supplied
+      newArguments[newArguments.length - 1] = function () {
+        setImmediate(cb);
+        try {
+          lastArg.apply(null, arguments);
+        } catch (ex) {
+          process.emit('uncaughtException', ex);
+        }
+      };
+    } else if (!lastArg && task.arguments.length !== 0) {
+      // false/undefined/null supplied as callback
+      newArguments[newArguments.length - 1] = function () {
+        cb();
+      };
+    } else {
+      // Nothing supplied as callback
+      newArguments.push(() => {
+        cb();
+      });
+    }
+
+    // debug('run', { task, newArguments });
+    task.fn.apply(task.this, newArguments);
+  }, 1);
+}
+
+/**
+ * If executor is ready, queue task (and process it immediately if executor was idle)
+ * If not, buffer task for later processing
+ * @param {Object} task
+ *                 task.this - Object to use as this
+ *                 task.fn - Function to execute
+ *                 task.arguments - Array of arguments, IMPORTANT: only the last argument may be a function (the callback)
+ *                                                                 and the last argument cannot be false/undefined/null
+ * @param {Boolean} forceQueuing Optional (defaults to false) force executor to queue task even if it is not ready
+ * @param {Boolean} close Optional (defaults to false) stop further tasks from being pushed to the queue or buffer
+ */
+Executor.prototype.push = function (task, forceQueuing, close) {
+  // debug('push', { task, forceQueuing, close });
+  if (close === true) {
+    // stop further tasks from being added.
+    this.open = false;
+    this.processBuffer();
+    this.queue.push(task);
+  } else if (this.open) {
+    this._push(task, forceQueuing);
+  } else {
+    // return an error if a callback exists, otherwise throw an exception
+    const err = new Error('Attempting operation on closed database.');
+    const args = task.arguments;
+    if (args.length > 0) {
+      const cb = args[args.length - 1];
+      if (typeof cb === 'function') {
+        cb(err);
+        return;
+      }
+    }
+    throw err;
+  }
+};
+
+// eslint-disable-next-line no-underscore-dangle
+Executor.prototype._push = function (task, forceQueuing) {
+  if (this.ready || forceQueuing) {
+    this.queue.push(task);
+  } else {
+    this.buffer.push(task);
+  }
+};
+
+/**
+ * Queue all tasks in buffer (in the same order they came in)
+ * Automatically sets executor as ready
+ */
+Executor.prototype.processBuffer = function () {
+  let i;
+  this.ready = true;
+  for (i = 0; i < this.buffer.length; i++) {
+    this.queue.push(this.buffer[i]);
+  }
+  this.buffer = [];
+};
+
+// Interface
+module.exports = Executor;
