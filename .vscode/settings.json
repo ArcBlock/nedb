@@ -1,8 +1,6 @@
 {
   "search.exclude": {
     "**/*.js.map": true,
-    "core/webapp/blocklet.js": true,
-    "core/webapp/.blocklet": true,
     "**/dist/": true,
     "**/build/": true,
     "**/*.chunk.js": true

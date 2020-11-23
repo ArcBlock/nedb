@@ -6,22 +6,9 @@ VERSION=$(strip $(shell cat version))
 build:
 	@echo "Building the software..."
 	@lerna bootstrap
-	@cd core/client && npm run build
-	@cd core/webapp && npm run build:client
-	@cd core/webapp && npm run build:server
-	@echo "Local ABT Node is successfully built..."
-
-build-debug:
-	@echo "Building the software..."
-	@lerna bootstrap
-	@cd core/client && npm run build
-	@cd core/webapp && npm run build:client
-	@cd core/webapp && npm run build-server-debug
-	@echo "Local DEBUG ABT Node is successfully built..."
 
 init: install dep
 	@echo "Initializing the repo..."
-	@brew install nginx
 
 travis-init: install dep
 	@echo "Initialize software required for travis (normally ubuntu software)"
@@ -34,7 +21,6 @@ dep:
 	@echo "Install dependencies required for this repo..."
 	@lerna bootstrap
 	@lerna link
-	@cd core/client && npm run build
 
 pre-build: install dep
 	@echo "Running scripts before the build..."
@@ -58,7 +44,6 @@ travis-deploy: release
 
 dotenv:
 	@echo "Fix dot env file..."
-	@echo "SKIP_PREFLIGHT_CHECK=true" > core/webapp/.env
 
 clean:
 	@echo "Cleaning the build..."
