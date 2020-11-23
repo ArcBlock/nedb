@@ -14,11 +14,11 @@
     "babel-eslint": "^10.1.0",
     "eslint": "6.8.0",
     "eslint-config-airbnb": "18.1.0",
-    "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-react": "^7.11.0",
     "eslint-config-prettier": "latest",
     "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-prettier": "latest",
+    "eslint-plugin-react": "^7.11.0",
     "husky": "^4.2.3",
     "jsdoc": "^3.6.3",
     "lerna": "^3.22.1",
@@ -51,5 +51,8 @@
       "pre-commit": "lint-staged && lerna run precommit",
       "pre-push": "lint-staged && lerna run prepush"
     }
+  },
+  "dependencies": {
+    "axios": "^0.21.0"
   }
 }
