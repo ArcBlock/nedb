@@ -9,7 +9,7 @@ Two implementations of binary search tree: <a href="http://en.wikipedia.org/wiki
 Package name is `binary-search-tree`.
 
 ```bash
-npm install @abtnode/binary-search-tree --save
+npm install @nedb/binary-search-tree --save
 
 make test
 ```
@@ -21,8 +21,8 @@ The API mainly provides 3 functions: `insert`, `search` and `delete`. If you do 
 Values inserted can be anything except `undefined`.
 
 ```javascript
-var BinarySearchTree = require('@abtnode/binary-search-tree').BinarySearchTree,
-  AVLTree = require('@abtnode/binary-search-tree').AVLTree; // Same API as BinarySearchTree
+var BinarySearchTree = require('@nedb/binary-search-tree').BinarySearchTree,
+  AVLTree = require('@nedb/binary-search-tree').AVLTree; // Same API as BinarySearchTree
 
 // Creating a binary search tree
 var bst = new BinarySearchTree();

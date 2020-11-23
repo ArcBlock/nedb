@@ -1,6 +1,7 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable func-names */
-const BinarySearchTree = require('@abtnode/binary-search-tree').AVLTree;
+const BinarySearchTree = require('@nedb/binary-search-tree').AVLTree;
 const util = require('util');
 const model = require('./model');
 /**
@@ -150,7 +151,6 @@ Index.prototype.insertMultipleDocs = function (docs) {
  * O(log(n))
  */
 Index.prototype.remove = function (doc) {
-  let key;
   const self = this;
 
   if (Array.isArray(doc)) {
@@ -160,7 +160,7 @@ Index.prototype.remove = function (doc) {
     return;
   }
 
-  key = this.keyFn(this._extractKey(doc));
+  const key = this.keyFn(this._extractKey(doc));
 
   if (key === undefined && this.sparse) {
     return;

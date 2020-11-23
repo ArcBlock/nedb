@@ -1,4 +1,4 @@
-const DataStore = require('@abtnode/nedb');
+const DataStore = require('@nedb/core');
 const errio = require('errio');
 
 const utils = require('./utils');

@@ -19,7 +19,7 @@ Bitcoin address: 1dDZLnWpBbodPiN8sizzYrgaz5iahFyb1
 Module name on npm and bower is `nedb`.
 
 ```
-npm install @abtnode/nedb --save    # Put latest version in your package.json
+npm install @nedb/core --save    # Put latest version in your package.json
 npm test                   # You'll need the dev dependencies to launch tests
 ```
 
@@ -71,11 +71,11 @@ Also, if `loadDatabase` fails, all commands registered to the executor afterward
 
 ```javascript
 // Type 1: In-memory only datastore (no need to load the database)
-var Datastore = require('@abtnode/nedb'),
+var Datastore = require('@nedb/core'),
   db = new Datastore();
 
 // Type 2: Persistent datastore with manual loading
-var Datastore = require('@abtnode/nedb'),
+var Datastore = require('@nedb/core'),
   db = new Datastore({ filename: 'path/to/datafile' });
 db.loadDatabase(function (err) {
   // Callback is optional
@@ -83,13 +83,13 @@ db.loadDatabase(function (err) {
 });
 
 // Type 3: Persistent datastore with automatic loading
-var Datastore = require('@abtnode/nedb'),
+var Datastore = require('@nedb/core'),
   db = new Datastore({ filename: 'path/to/datafile', autoload: true });
 // You can issue commands right away
 
 // Type 4: Persistent datastore for a Node Webkit app called 'nwtest'
 // For example on Linux, the datafile will be ~/.config/nwtest/nedb-data/something.db
-var Datastore = require('@abtnode/nedb'),
+var Datastore = require('@nedb/core'),
   path = require('path'),
   db = new Datastore({ filename: path.join(require('nw.gui').App.dataPath, 'something.db') });
 
