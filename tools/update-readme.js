@@ -15,7 +15,7 @@ const packageList = getPackages({ publicOnly: true }).map(
 );
 
 const readmeFile = path.join(__dirname, '../README.md');
-const readmeContent = `![abt-node](https://www.arcblock.io/.netlify/functions/badge?text=ABT%20Node)
+const readmeContent = `![nedb](https://www.arcblock.io/.netlify/functions/badge?text=NEDB)
 
 ## Table of Contents
 
@@ -32,7 +32,15 @@ const readmeContent = `![abt-node](https://www.arcblock.io/.netlify/functions/ba
 
 > Last updated at ${new Date().toLocaleString()}
 
-This repo contains ABT Node Daemon and core blocklets.
+This repo contains a [NEDB](https://github.com/louischatriot/nedb) fork used by ArcBlock products.
+
+Along with the NEDB core, we have updated several related packages to improve performance, security and compatibility:
+
+- Most dependencies are upgraded to latest to get better security and performance
+- Use @nedb/multi to read and write to the same database in different node.js processes
+- Use @nedb/mongoose-driver as a drop-in replacement for mongoose + mongodb to make apps lightweight
+
+Limitations: if you want to use nedb in browser, please use the original version.
 
 ## Getting Started
 
@@ -41,6 +49,12 @@ Checkout instructions [here](./docs/contribute.md) on how to contribute.
 ## Packages
 
 ${packageList.join('\n')}
+
+## Credits
+
+- [NEDB Core](https://github.com/louischatriot/nedb)
+- [NEDB Multi](https://github.com/vangelov/nedb-multi)
+
 `;
 
 fs.writeFileSync(readmeFile, readmeContent);

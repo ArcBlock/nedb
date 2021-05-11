@@ -37,3 +37,7 @@ Run it with: `npm install`, then `npm start`
 ### Test
 
 To run the tests execute: `npm test`.
+
+## Credits
+
+- https://github.com/vangelov/nedb-multi
