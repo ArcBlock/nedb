@@ -14,6 +14,9 @@ const resultFnList = [
 ];
 
 function proxyFn(raw) {
+  if (raw === undefined) {
+    return undefined;
+  }
   return new Proxy(raw, {
     // target 是目标对象
     // prop 是目标对象调用的方法
