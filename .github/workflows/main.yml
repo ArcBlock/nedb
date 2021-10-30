@@ -43,7 +43,7 @@ jobs:
 
       - name: Update Docs
         run: |
-          node scripts/update-readme.js
+          node tools/update-readme.js
           git add README.md
           git commit -m '[skip ci] update readme'
 
@@ -54,6 +54,6 @@ jobs:
           branch: ${{ github.ref }}
 
       - name: Post publish
-        run: node scripts/post-publish.js
+        run: node tools/post-publish.js
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
