@@ -8,9 +8,9 @@ const resultFnList = Object.freeze([
   // extra action
   'ensureIndex',
   'removeIndex',
-  // 'getCandidates',
-  // 'loadDatabase',
-  // 'closeDatabase',
+  'getCandidates',
+  'loadDatabase',
+  'closeDatabase',
 ]);
 
 function proxyFn(raw) {
@@ -58,6 +58,10 @@ function proxyFn(raw) {
         if (resultFnList.includes(prop)) {
           // 这些方法执行完返回的是 undefined，必须通过回调函数获得结果
           return function wrap(...args) {
+            // 如果有传入回调函数，则通过回调函数返回结果
+            if (typeof args[args.length - 1] === 'function') {
+              return propFn.bind(this)(...args);
+            }
             return new Promise((resolve, reject) => {
               propFn.bind(this)(...args, (err, data) => {
                 if (err) {
