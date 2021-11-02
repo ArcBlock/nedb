@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ArcBlock/abt-node.git"
+    "url": "git+https://github.com/ArcBlock/nedb.git"
   },
   "keywords": [
     "nedb",
@@ -27,9 +27,9 @@
   "author": "Warren Seine, wangshijun",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ArcBlock/abt-node/issues"
+    "url": "https://github.com/ArcBlock/nedb/issues"
   },
-  "homepage": "https://github.com/ArcBlock/abt-node#readme",
+  "homepage": "https://github.com/ArcBlock/nedb#readme",
   "dependencies": {
     "@nedb/core": "^1.1.0",
     "bson": "~1.0.4",
