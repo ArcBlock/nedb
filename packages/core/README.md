@@ -661,6 +661,22 @@ db.ensureIndex({ fieldName: 'expirationDate', expireAfterSeconds: 0 }, function 
 
 **Note:** the `ensureIndex` function creates the index synchronously, so it's best to use it at application startup. It's quite fast so it doesn't increase startup time much (35 ms for a collection containing 10,000 documents).
 
+## Promise support
+
+You can use the `.then()` and `.catch()` methods to get a Promise back. Also support async/await.
+But don't support `.finally()` for now.
+Promised Nedb not support cluster mode.
+
+### example
+
+```javascript
+const { PromisedDatastore } = require('@nedb/core');
+const db = new PromisedDatastore({ filename: 'data.db', autoload: true });
+(async () => {
+  const data = await db.find();
+})();
+```
+
 ## Browser version
 
 The browser version and its minified counterpart are in the `browser-version/out` directory. You only need to require `nedb.js` or `nedb.min.js` in your HTML file and the global object `Nedb` can be used right away, with the same API as the server version:
