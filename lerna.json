@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.1",
   "useWorkspaces": true,
   "npmClient": "yarn",
   "command": {
@@ -7,5 +7,7 @@
       "message": "[skip ci] %s"
     }
   },
-  "packages": ["packages/*"]
+  "packages": [
+    "packages/*"
+  ]
 }
