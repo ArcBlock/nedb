@@ -1,6 +1,6 @@
 {
   "name": "@nedb/mongoose-driver",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A Mongoose driver for NeDB.",
   "main": "index.js",
   "files": [
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/ArcBlock/nedb#readme",
   "dependencies": {
-    "@nedb/core": "1.2.1",
+    "@nedb/core": "1.2.2",
     "bson": "~1.0.4",
     "debug": "^4.2.0",
     "mongoose": "^4.13.21"
