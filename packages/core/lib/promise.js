@@ -1,7 +1,7 @@
 const DataStore = require('./datastore');
 
-const chainFnList = ['find', 'findOne', 'count', 'sort', 'skip', 'limit', 'projection'];
-const resultFnList = [
+const cursorFnList = Object.freeze(['find', 'findOne', 'count', 'sort', 'skip', 'limit', 'projection']);
+const resultFnList = Object.freeze([
   'insert',
   'remove',
   'update',
@@ -11,7 +11,7 @@ const resultFnList = [
   // 'getCandidates',
   // 'loadDatabase',
   // 'closeDatabase',
-];
+]);
 
 function proxyFn(raw) {
   if (raw === undefined) {
@@ -47,7 +47,7 @@ function proxyFn(raw) {
       const propFn = target[prop];
 
       if (typeof propFn === 'function') {
-        if (chainFnList.includes(prop)) {
+        if (cursorFnList.includes(prop)) {
           // 这些方法返回的是 cursor 对象，可以进行链式调用
           return function wrap(...args) {
             const rawFn = propFn.bind(this)(...args);
@@ -76,11 +76,13 @@ function proxyFn(raw) {
   });
 }
 
-const PromiseDataStore = new Proxy(DataStore, {
+const PromisedDataStore = new Proxy(DataStore, {
   get(target, prop) {
     const raw = target[prop];
+    if (prop === 'CURSOR_FN_LIST') return cursorFnList;
+    if (prop === 'RESULT_FN_LIST') return resultFnList;
     return proxyFn(raw);
   },
 });
 
-module.exports = PromiseDataStore;
+module.exports = PromisedDataStore;

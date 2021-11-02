@@ -18,10 +18,10 @@
     "datastore",
     "embedded"
   ],
-  "homepage": "https://github.com/ArcBlock/abt-node",
+  "homepage": "https://github.com/ArcBlock/nedb",
   "repository": {
     "type": "git",
-    "url": "git@github.com:ArcBlock/abt-node.git"
+    "url": "git@github.com:ArcBlock/nedb.git"
   },
   "files": [
     "lib",
