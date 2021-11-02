@@ -14,7 +14,7 @@ const testDb = 'workspace/promise.db';
 describe('Promisify Database', () => {
   let db;
 
-  beforeEach((done) => {
+  beforeEach(async () => {
     // create db
     db = new Datastore({ filename: testDb });
     db.filename.should.equal(testDb);
@@ -30,10 +30,8 @@ describe('Promisify Database', () => {
     }
 
     // make sure db is empty
-    db.loadDatabase(() => {
-      db.getAllData().length.should.equal(0);
-      done();
-    });
+    await db.loadDatabase();
+    db.getAllData().length.should.equal(0);
   });
 
   it('Can find data', async () => {
@@ -100,5 +98,18 @@ describe('Promisify Database', () => {
 
     const data = await db.count();
     data.should.equal(rawList.length);
+  });
+
+  it('Can use with callback', (done) => {
+    const rawList = Array.from(Array(3).keys());
+    db.insert(
+      rawList.map((i) => ({ somedata: i })),
+      () => {
+        db.count({}, (err, data) => {
+          data.should.equal(rawList.length);
+          done();
+        });
+      }
+    );
   });
 });
