@@ -1,7 +1,10 @@
+## 1.2.3 (May 26, 2022)
+
+- chore(security): bump dependencies
+
 ## 1.2.2 (十一月 02, 2021)
 
 - feat: full promisify for nedb/core
-- [skip ci] update readme
 
 ## 1.2.1 (十一月 02, 2021)
 
