@@ -30,8 +30,8 @@
   ],
   "dependencies": {
     "@nedb/binary-search-tree": "1.2.2",
-    "async": "^3.2.0",
-    "debug": "^4.2.0",
+    "async": "^3.2.3",
+    "debug": "^4.3.4",
     "localforage": "^1.9.0",
     "mkdirp": "^1.0.4",
     "node-line-reader": "0.0.3"
@@ -41,7 +41,7 @@
     "commander": "1.1.1",
     "exec-time": "0.0.2",
     "mocha": "8.x",
-    "underscore": "~1.4.4"
+    "underscore": "~1.13.3"
   },
   "scripts": {
     "precommit": "npm run test",

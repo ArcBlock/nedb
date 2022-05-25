@@ -23,7 +23,7 @@
   "devDependencies": {
     "chai": "1.0.x",
     "mocha": "1.4.x",
-    "underscore": "~1.4.4"
+    "underscore": "~1.13.3"
   },
   "scripts": {
     "precommit": "npm run test",
