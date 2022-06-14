@@ -39,6 +39,43 @@ test('calling loadDatabase', (t) => {
   });
 });
 
+test('calling closeDatabase', (t) => {
+  const handler = proxyquire('../../lib/handler', {
+    nedb: class {
+      loadDatabase(callback) {
+        // eslint-disable-line class-methods-use-this
+        process.nextTick(() => callback(null, {}));
+      }
+
+      closeDatabase(callback) {
+        // eslint-disable-line class-methods-use-this
+        process.nextTick(() => callback(null, {}));
+      }
+    },
+  });
+
+  t.test('should work as expected', (st) => {
+    const dbsMap = new Map();
+    const messagesHandler = handler.create(dbsMap);
+
+    messagesHandler({ filename: 'file' }, 'loadDatabase', [], () => {
+      const db1 = dbsMap.get('file');
+      st.ok(db1);
+
+      messagesHandler({ filename: 'file' }, 'closeDatabase', [], () => {
+        const db2 = dbsMap.get('file');
+        st.notOk(db2);
+
+        messagesHandler({ filename: 'file' }, 'loadDatabase', [], () => {
+          const db3 = dbsMap.get('file');
+          st.notEqual(db3, db1);
+          st.end();
+        });
+      });
+    });
+  });
+});
+
 test('calling other methods', (t) => {
   t.test('when db has been loaded', (st) => {
     const result = {};
