@@ -1,5 +1,6 @@
 exports.METHODS_DESCRIPTIONS = [
   { name: 'loadDatabase', supportsCursor: false },
+  { name: 'closeDatabase', supportsCursor: false },
   { name: 'insert', supportsCursor: false },
   { name: 'find', supportsCursor: true },
   { name: 'findOne', supportsCursor: true },
