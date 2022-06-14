@@ -13,7 +13,7 @@
 [![docs](https://img.shields.io/badge/powered%20by-arcblock-green.svg)](https://docs.arcblock.io)
 [![Gitter](https://badges.gitter.im/ArcBlock/community.svg)](https://gitter.im/ArcBlock/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-> Last updated at 5/25/2022, 10:53:52 PM
+> Last updated at 6/14/2022, 11:15:22 PM
 
 This repo contains a [NEDB](https://github.com/louischatriot/nedb) fork used by ArcBlock products.
 
