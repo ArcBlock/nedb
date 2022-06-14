@@ -1,3 +1,7 @@
+## 1.3.0 (June 14, 2022)
+
+- feat: support closeDatabase for @nedb/multi
+
 ## 1.2.3 (May 26, 2022)
 
 - chore(security): bump dependencies
