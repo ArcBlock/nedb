@@ -619,36 +619,32 @@ describe('Database', () => {
 
     it('TTL indexes can expire multiple documents and only what needs to be expired', (done) => {
       d.ensureIndex({ fieldName: 'exp', expireAfterSeconds: 0.2 }, () => {
-        d.insert({ hello: 'world1', exp: new Date() }, () => {
-          d.insert({ hello: 'world2', exp: new Date() }, () => {
+        d.insert({ hello: 'world1', exp: Date.now() }, () => {
+          d.insert({ hello: 'world2', exp: new Date().toString() }, () => {
             d.insert({ hello: 'world3', exp: new Date(new Date().getTime() + 100) }, () => {
-              d.insert({ hello: 'world4', exp: new Date().toString() }, () => {
-                d.insert({ hello: 'world5', exp: Date.now() }, () => {
-                  setTimeout(() => {
-                    d.find({}, (err, docs) => {
-                      assert.isNull(err);
-                      docs.length.should.equal(3);
+              setTimeout(() => {
+                d.find({}, (err, docs) => {
+                  assert.isNull(err);
+                  docs.length.should.equal(3);
 
-                      setTimeout(() => {
+                  setTimeout(() => {
+                    d.find({}, function (err, docs) {
+                      assert.isNull(err);
+                      docs.length.should.equal(1);
+                      docs[0].hello.should.equal('world3');
+
+                      setTimeout(function () {
                         d.find({}, function (err, docs) {
                           assert.isNull(err);
-                          docs.length.should.equal(1);
-                          docs[0].hello.should.equal('world3');
+                          docs.length.should.equal(0);
 
-                          setTimeout(function () {
-                            d.find({}, function (err, docs) {
-                              assert.isNull(err);
-                              docs.length.should.equal(0);
-
-                              done();
-                            });
-                          }, 101);
+                          done();
                         });
                       }, 101);
                     });
-                  }, 100);
+                  }, 101);
                 });
-              });
+              }, 100);
             });
           });
         });
