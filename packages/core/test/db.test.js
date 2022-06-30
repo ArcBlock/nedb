@@ -622,29 +622,33 @@ describe('Database', () => {
         d.insert({ hello: 'world1', exp: new Date() }, () => {
           d.insert({ hello: 'world2', exp: new Date() }, () => {
             d.insert({ hello: 'world3', exp: new Date(new Date().getTime() + 100) }, () => {
-              setTimeout(() => {
-                d.find({}, (err, docs) => {
-                  assert.isNull(err);
-                  docs.length.should.equal(3);
-
+              d.insert({ hello: 'world4', exp: new Date().toString() }, () => {
+                d.insert({ hello: 'world5', exp: Date.now() }, () => {
                   setTimeout(() => {
-                    d.find({}, function (err, docs) {
+                    d.find({}, (err, docs) => {
                       assert.isNull(err);
-                      docs.length.should.equal(1);
-                      docs[0].hello.should.equal('world3');
+                      docs.length.should.equal(3);
 
-                      setTimeout(function () {
+                      setTimeout(() => {
                         d.find({}, function (err, docs) {
                           assert.isNull(err);
-                          docs.length.should.equal(0);
+                          docs.length.should.equal(1);
+                          docs[0].hello.should.equal('world3');
 
-                          done();
+                          setTimeout(function () {
+                            d.find({}, function (err, docs) {
+                              assert.isNull(err);
+                              docs.length.should.equal(0);
+
+                              done();
+                            });
+                          }, 101);
                         });
                       }, 101);
                     });
-                  }, 101);
+                  }, 100);
                 });
-              }, 100);
+              });
             });
           });
         });
