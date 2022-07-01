@@ -1,6 +1,6 @@
 ## 1.3.1 (June 30, 2022)
 
-- fix(core): expireAfterSeconds is not worked
+fix(core): expireAfterSeconds does not work in @nedb/multi
 
 ## 1.3.0 (June 14, 2022)
 
