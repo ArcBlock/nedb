@@ -368,7 +368,15 @@ Datastore.prototype.getCandidates = function (query, dontExpireStaleDocs, callba
   for (const doc of docs) {
     let valid = true;
     for (const i in this.ttlIndexes) {
-      const d = doc[i];
+      let d = doc[i];
+      // 使用 @nedb/multi 后，Date 类型会被序列化为字符串
+      if (typeof d === 'string' || typeof d === 'number') {
+        d = new Date(d);
+        if (d.toString() === 'Invalid Date') {
+          d = doc[i];
+        }
+      }
+
       if (d !== undefined && d instanceof Date && Date.now() > d.getTime() + this.ttlIndexes[i] * 1000) {
         valid = false;
       }

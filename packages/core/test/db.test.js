@@ -619,8 +619,8 @@ describe('Database', () => {
 
     it('TTL indexes can expire multiple documents and only what needs to be expired', (done) => {
       d.ensureIndex({ fieldName: 'exp', expireAfterSeconds: 0.2 }, () => {
-        d.insert({ hello: 'world1', exp: new Date() }, () => {
-          d.insert({ hello: 'world2', exp: new Date() }, () => {
+        d.insert({ hello: 'world1', exp: Date.now() }, () => {
+          d.insert({ hello: 'world2', exp: new Date().toISOString() }, () => {
             d.insert({ hello: 'world3', exp: new Date(new Date().getTime() + 100) }, () => {
               setTimeout(() => {
                 d.find({}, (err, docs) => {
