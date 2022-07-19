@@ -74,7 +74,7 @@ function proxyFn(raw) {
                   return;
                 }
 
-                if (args.length === 1) {
+                if (resultArgs.length === 1) {
                   resolve(resultArgs[0]);
                   return;
                 }
