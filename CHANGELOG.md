@@ -1,3 +1,7 @@
+## 1.3.2 (July 19, 2022)
+
+- fix: returnUpdatedDocs option does not work
+
 ## 1.3.1 (June 30, 2022)
 
 fix(core): expireAfterSeconds does not work in @nedb/multi
