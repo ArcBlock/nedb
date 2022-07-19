@@ -53,10 +53,15 @@ describe('Promisify Database', () => {
 
   it('Can update data', async () => {
     const { _id } = await db.insert({ somedata: 'ok' });
-    await db.update({ _id }, { somedata: 'updated' });
+    const count = await db.update({ _id }, { somedata: 'updated' });
 
     const data = await db.findOne({ _id });
     data.somedata.should.equal('updated');
+    count.should.equal(1);
+
+    const [count1, doc] = await db.update({ _id }, { somedata: 'updated-1' }, { returnUpdatedDocs: true });
+    count1.should.equal(1);
+    doc.somedata.should.equal('updated-1');
   });
 
   it('Can find skip & limit data', async () => {

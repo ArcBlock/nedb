@@ -63,12 +63,23 @@ function proxyFn(raw) {
               return propFn.bind(this)(...args);
             }
             return new Promise((resolve, reject) => {
-              propFn.bind(this)(...args, (err, data) => {
+              propFn.bind(this)(...args, (err, ...resultArgs) => {
                 if (err) {
                   reject(err);
                   return;
                 }
-                resolve(data);
+
+                if (resultArgs.length === 0) {
+                  resolve();
+                  return;
+                }
+
+                if (resultArgs.length === 1) {
+                  resolve(resultArgs[0]);
+                  return;
+                }
+
+                resolve(resultArgs);
               });
             });
           };
