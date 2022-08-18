@@ -1,3 +1,7 @@
+## 1.3.3 (August 18, 2022)
+
+- fix(multi): server may crashed when closing a closed database
+
 ## 1.3.2 (July 19, 2022)
 
 - fix: returnUpdatedDocs option does not work
