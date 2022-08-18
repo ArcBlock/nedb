@@ -40,16 +40,23 @@ exports.create = (dbsMap) => (options, method, dataOnlyArgs, reply) => {
   } else if (method === constants.PERSISTENCE_STOP_AUTOCOMPACTION) {
     db.persistence.stopAutocompaction();
   } else if (method === 'closeDatabase') {
-    db.closeDatabase(...dataOnlyArgs, (...args) => {
-      if (args[0] === null) {
-        dbsMap.delete(filename);
-        console.log(`Close database ${filename}`);
-      } else {
-        console.error(`Failed to close database ${filename}`, args[0] && args[0].message);
-      }
+    // always delete db from dbMap and return success
+    // db.closeDatabase is not safe
+    // db.closeDatabase is not atomic
+    dbsMap.delete(filename);
+    replyCallback(reply)([null]);
 
-      replyCallback(reply)(...args);
-    });
+    try {
+      db.closeDatabase(...dataOnlyArgs, (...args) => {
+        if (args[0] === null) {
+          console.log(`Close database ${filename}`);
+        } else {
+          console.error(`Failed to close database ${filename}`, args[0] && args[0].message);
+        }
+      });
+    } catch (err) {
+      console.error(`Failed to close database ${filename}`, err.message);
+    }
   } else {
     db[method].call(db, ...dataOnlyArgs, replyCallback(reply));
   }
