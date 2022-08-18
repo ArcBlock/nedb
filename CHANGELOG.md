@@ -1,3 +1,7 @@
+## 1.3.4 (August 18, 2022)
+
+- fix(multi): fix bug of closeDatabase()
+
 ## 1.3.3 (August 18, 2022)
 
 - fix(multi): server may crashed when closing a closed database

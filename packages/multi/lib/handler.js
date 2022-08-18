@@ -44,7 +44,7 @@ exports.create = (dbsMap) => (options, method, dataOnlyArgs, reply) => {
     // db.closeDatabase is not safe
     // db.closeDatabase is not atomic
     dbsMap.delete(filename);
-    replyCallback(reply)([null]);
+    replyCallback(reply)(null);
 
     try {
       db.closeDatabase(...dataOnlyArgs, (...args) => {
