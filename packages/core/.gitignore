@@ -9,6 +9,7 @@ lib-cov
 .idea
 pids
 logs
+lib
 results
 
 yarn.lock

@@ -1,4 +1,4 @@
-const DataStore = require('./datastore');
+import { DataStore } from './datastore';
 
 const cursorFnList = Object.freeze(['find', 'findOne', 'count', 'sort', 'skip', 'limit', 'projection']);
 const resultFnList = Object.freeze([
@@ -13,7 +13,7 @@ const resultFnList = Object.freeze([
   'closeDatabase',
 ]);
 
-function proxyFn(raw) {
+function proxyFn(raw: typeof DataStore) {
   if (raw === undefined) {
     return undefined;
   }
@@ -91,7 +91,11 @@ function proxyFn(raw) {
   });
 }
 
-const PromisedDataStore = new Proxy(DataStore, {
+interface Promisified<T> {
+  remove(query: FilterQuery<T>, options: RemoveOptions): PromiseLike<number>;
+}
+
+const ProxiedDataStore = new Proxy(DataStore, {
   get(target, prop) {
     const raw = target[prop];
     if (prop === 'CURSOR_FN_LIST') return cursorFnList;
@@ -100,4 +104,6 @@ const PromisedDataStore = new Proxy(DataStore, {
   },
 });
 
-module.exports = PromisedDataStore;
+export default function PromisedDataStore<T>(): Promisified<T> {
+  return new ProxiedDataStore<T>;
+}
