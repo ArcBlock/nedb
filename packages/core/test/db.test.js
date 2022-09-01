@@ -1638,7 +1638,9 @@ describe('Database', () => {
             d.update({ a: 2 }, { $inc: { a: 10 } }, (err, nr) => {
               assert.isNull(err);
               nr.should.equal(1);
-              d.find({}, (err, docs) => {
+
+              d.find({}, {}, (err, docs) => {
+                console.log('found', err, docs);
                 const d1 = _.find(docs, (doc) => doc._id === doc1._id);
                 var d2 = _.find(docs, (doc) => {
                   return doc._id === doc2._id;

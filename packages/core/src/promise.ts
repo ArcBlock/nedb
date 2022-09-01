@@ -78,11 +78,12 @@ export class PromisedDatastore<T> extends Datastore<T> {
 
   update(query: FilterQuery<T>, updateQuery: T, options?: UpdateOptions): PromiseLike<any> {
     return new Promise((resolve, reject) => {
-      super.update(query, updateQuery, options, (err, ...rest) => {
+      // @ts-ignore
+      super.update(query, updateQuery, options, (err, rowsAffected, updatedDocs) => {
         if (err) {
           reject(err);
         } else {
-          resolve(...rest);
+          updatedDocs ? resolve([rowsAffected, updatedDocs]) : resolve(rowsAffected);
         }
       });
     });

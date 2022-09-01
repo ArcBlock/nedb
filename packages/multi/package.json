@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "faucet": "0.0.1",
-    "proxyquire": "^1.7.11",
-    "tape": "^4.6.3"
+    "proxyquire": "^1.8.0",
+    "tape": "^4.16.0"
   }
 }

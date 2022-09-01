@@ -605,7 +605,7 @@ export class Datastore<T> extends EventEmitter {
       return cb(null, res);
     });
 
-    customUtils.adaptToMongoose(cursor, projection);
+    cursor.projection(projection);
 
     if (typeof callback === 'function') {
       cursor.exec(callback);
@@ -651,7 +651,7 @@ export class Datastore<T> extends EventEmitter {
       return cb(null, null);
     });
 
-    customUtils.adaptToMongoose(cursor, projection);
+    cursor.projection(projection);
     cursor.limit(1);
 
     if (typeof callback === 'function') {
@@ -756,7 +756,7 @@ export class Datastore<T> extends EventEmitter {
               return callback(err);
             }
             // @ts-ignore
-            return callback(null, 1, newDoc, true);
+            return callback(null, 1, newDoc);
           });
         });
       },
