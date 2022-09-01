@@ -11,7 +11,7 @@ const { PromisedDatastore: Datastore } = require('../lib/promise');
 
 const testDb = 'workspace/promise.db';
 
-describe.only('Promisify Database', () => {
+describe('Promisify Database', () => {
   let db;
 
   beforeEach(async () => {
