@@ -7,7 +7,7 @@ const fs = require('fs');
 const get = require('lodash/get');
 
 const model = require('../lib/model');
-const Datastore = require('../lib/datastore');
+const { Datastore } = require('../lib/datastore');
 
 describe('Model', () => {
   describe('Serialization, deserialization', () => {

@@ -9,7 +9,6 @@
     "strictNullChecks": false,
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node"],
     "resolveJsonModule": true
   }
 }

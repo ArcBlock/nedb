@@ -1,18 +1,19 @@
-import { Datastore } from './src';
+import { Datastore, PromisedDatastore } from './src';
 
 type Market = {
   appId: string;
   appName: string;
   appPk?: string;
   appLink?: string;
-  viewCount?: string;
+  viewCount?: number;
   createdAt?: string;
   updatedAt?: string;
 };
 
-const store = new Datastore<Market>({ timestampData: true });
+const s = new Datastore<Market>({ timestampData: true });
+const p = new PromisedDatastore<Market>({ timestampData: true });
 
-store.insert(
+s.insert(
   {
     appId: '1',
     appName: 'test',
@@ -22,6 +23,19 @@ store.insert(
       console.error(err);
     }
 
-    console.log({ item });
+    console.log(item);
   }
 );
+
+s.find({ $or: [{ appId: '1' }, { appName: 'test' }] }, (err, docs) => {
+  console.log(docs?.map((x) => x.appId));
+});
+
+p.insert({ appId: '1-p', appName: 'test-p' }).then(console.log);
+
+p.count({ viewCount: { $gt: 3, $lt: '' }, appId: '1-p' }).then(console.log);
+
+// p.insert({
+//   appId: '1',
+//   appName: 'test',
+// }).then(console.log);

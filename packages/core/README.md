@@ -670,8 +670,8 @@ Promised Nedb not support cluster mode.
 ### example
 
 ```javascript
-const { PromisedDatastore } = require('@nedb/core');
-const db = new PromisedDatastore({ filename: 'data.db', autoload: true });
+const { PromisedNedb } = require('@nedb/core');
+const db = new PromisedNedb({ filename: 'data.db', autoload: true });
 (async () => {
   const data = await db.find();
 })();

@@ -11,7 +11,7 @@ const [AsyncWaterfall, AsyncApply, AsyncEach] = [
   require('async/each'),
 ];
 const model = require('../lib/model');
-const Datastore = require('../lib/datastore');
+const { Datastore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
 
 const reloadTimeUpperBound = 120;

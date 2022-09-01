@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/lines-between-class-members */
+/* eslint-disable import/first */
+/* eslint-disable import/order */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable no-continue */
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 /* eslint-disable prefer-rest-params */
@@ -54,7 +60,7 @@ import {
  * Event Emitter - Events
  * * compaction.done - Fired whenever a compaction operation was finished
  */
-export default class Datastore<T> extends EventEmitter {
+export class Datastore<T> extends EventEmitter {
   inMemoryOnly: boolean;
   autoload: boolean;
   timestampData: boolean;
@@ -356,7 +362,7 @@ export default class Datastore<T> extends EventEmitter {
    */
   getCandidates(
     query: FilterQuery<T>,
-    dontExpireStaleDocs: boolean | CallbackWithResult<any>,
+    dontExpireStaleDocs?: boolean | CallbackWithResult<any>,
     callback?: CallbackWithResult<any>
   ) {
     if (typeof dontExpireStaleDocs === 'function') {
@@ -420,7 +426,7 @@ export default class Datastore<T> extends EventEmitter {
           return cb();
         });
       },
-      (err: any) => callback(null, validDocs)
+      () => callback(null, validDocs)
     );
   }
 
@@ -428,7 +434,7 @@ export default class Datastore<T> extends EventEmitter {
    * Insert a new document
    * @param {Function} cb Optional callback, signature: err, insertedDoc
    */
-  private _insert(newDoc: T | T[], cb: CallbackWithResult<T>) {
+  private _insert(newDoc: T | T[], cb?: CallbackWithResult<T>) {
     const callback = cb || function () {};
     let preparedDoc: any;
 
@@ -525,17 +531,17 @@ export default class Datastore<T> extends EventEmitter {
     }
   }
 
-  public insert(doc: T, cb: CallbackWithResult<T>) {
+  public insert(doc: T | T[], cb?: CallbackWithResult<T>) {
     debug('insert', arguments);
     customUtils.convertObjectIdToString(doc);
-    this.executor.push({ this: this, fn: this._insert, arguments });
+    this.executor.push({ this: this, fn: this._insert, arguments: [doc, cb] });
   }
 
   /**
    * Count all documents matching the query
    * @param {Object} query MongoDB-style query
    */
-  public count(query: FilterQuery<T>, callback: CallbackWithResult<number>): typeof Cursor | void {
+  public count(query: FilterQuery<T>, callback?: CallbackWithResult<number>): typeof Cursor | void {
     debug('count', arguments);
 
     if (typeof query === 'function') {
@@ -566,8 +572,8 @@ export default class Datastore<T> extends EventEmitter {
    */
   public find(
     query: FilterQuery<T>,
-    projection: ProjectionFields<T> | CallbackWithResult<AnyArray<T>>,
-    callback: CallbackWithResult<AnyArray<T>>
+    projection?: ProjectionFields<T> | CallbackWithResult<AnyArray<T>>,
+    callback?: CallbackWithResult<AnyArray<T>>
   ): typeof Cursor | void {
     debug('find', arguments);
     switch (arguments.length) {
@@ -613,7 +619,7 @@ export default class Datastore<T> extends EventEmitter {
    */
   public findOne(
     query: FilterQuery<T>,
-    projection: ProjectionFields<T> | CallbackWithResult<T>,
+    projection?: ProjectionFields<T> | CallbackWithResult<T>,
     callback?: CallbackWithResult<T>
   ): typeof Cursor | void {
     debug('findOne', arguments);
@@ -678,7 +684,7 @@ export default class Datastore<T> extends EventEmitter {
   private _update(
     query: FilterQuery<T>,
     updateQuery: T,
-    options: UpdateOptions | CallbackWithResult<any>,
+    options?: UpdateOptions | CallbackWithResult<any>,
     cb?: CallbackWithResult<any>
   ): void {
     customUtils.convertObjectIdToString(query);
@@ -686,11 +692,8 @@ export default class Datastore<T> extends EventEmitter {
 
     debug('_update', { query, updateQuery, options });
 
-    let callback: CallbackWithResult<any>;
     const self = this;
     let numReplaced = 0;
-    let multi: boolean;
-    let upsert: boolean;
 
     if (typeof options === 'function') {
       cb = options;
@@ -698,9 +701,9 @@ export default class Datastore<T> extends EventEmitter {
     }
     if (!options) options = {};
 
-    callback = cb || function () {};
-    multi = options.multi !== undefined ? options.multi : false;
-    upsert = options.upsert !== undefined ? options.upsert : false;
+    const callback = cb || function () {};
+    const multi: boolean = options.multi !== undefined ? options.multi : false;
+    const upsert: boolean = options.upsert !== undefined ? options.upsert : false;
 
     AsyncWaterfall([
       function (cb: any) {
@@ -821,11 +824,11 @@ export default class Datastore<T> extends EventEmitter {
   public update(
     query: FilterQuery<T>,
     updateQuery: T,
-    options: UpdateOptions | CallbackWithResult<any>,
+    options?: UpdateOptions | CallbackWithResult<any>,
     cb?: CallbackWithResult<any>
   ) {
     debug('update', arguments);
-    this.executor.push({ this: this, fn: this._update, arguments });
+    this.executor.push({ this: this, fn: this._update, arguments: [query, updateQuery, options, cb] });
   }
 
   /**
@@ -835,27 +838,23 @@ export default class Datastore<T> extends EventEmitter {
    * @param {Object} options Optional options
    *                 options.multi If true, can remove multiple documents (defaults to false)
    * @param {Function} cb Optional callback, signature: err, numRemoved
-   *
-   * @api private Use Datastore.remove which has the same signature
    */
   private _remove(
     query: FilterQuery<T>,
-    options: RemoveOptions | CallbackWithResult<number>,
+    options?: RemoveOptions | CallbackWithResult<number>,
     cb?: CallbackWithResult<number>
   ) {
     debug('_remove', arguments);
-    let callback: CallbackWithResult<number>;
     const self = this;
     let numRemoved: number = 0;
     const removedDocs: any = [];
-    let multi: boolean;
 
     if (typeof options === 'function') {
       cb = options;
       options = {};
     }
-    callback = cb || function () {};
-    multi = options.multi !== undefined ? options.multi : false;
+    const callback = cb || function () {};
+    const multi = options.multi !== undefined ? options.multi : false;
 
     this.getCandidates(query, true, (err: any, candidates) => {
       if (err) {
@@ -885,10 +884,10 @@ export default class Datastore<T> extends EventEmitter {
 
   public remove(
     query: FilterQuery<T>,
-    options: RemoveOptions | CallbackWithResult<number>,
+    options?: RemoveOptions | CallbackWithResult<number>,
     cb?: CallbackWithResult<number>
   ) {
     debug('remove', arguments);
-    this.executor.push({ this: this, fn: this._remove, arguments });
+    this.executor.push({ this: this, fn: this._remove, arguments: [query, options, cb] });
   }
 }

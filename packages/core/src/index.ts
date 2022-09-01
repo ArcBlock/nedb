@@ -1,4 +1,4 @@
-import Datastore from './datastore';
-import PromisedDatastore from './promise';
+import { Datastore } from './datastore';
+import { PromisedDatastore } from './promise';
 
-export { PromisedDatastore, Datastore };
+export { Datastore, Datastore as NeDB, PromisedDatastore, PromisedDatastore as PromisedNeDB };

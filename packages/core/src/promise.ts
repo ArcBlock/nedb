@@ -1,109 +1,150 @@
-import { DataStore } from './datastore';
+import { Datastore } from './datastore';
+import { IndexOptions, FilterQuery, ProjectionFields, AnyArray, UpdateOptions, RemoveOptions } from './types';
 
-const cursorFnList = Object.freeze(['find', 'findOne', 'count', 'sort', 'skip', 'limit', 'projection']);
-const resultFnList = Object.freeze([
-  'insert',
-  'remove',
-  'update',
-  // extra action
-  'ensureIndex',
-  'removeIndex',
-  'getCandidates',
-  'loadDatabase',
-  'closeDatabase',
-]);
+const Cursor = require('./cursor');
 
-function proxyFn(raw: typeof DataStore) {
-  if (raw === undefined) {
-    return undefined;
+export class PromisedDatastore<T> extends Datastore<T> {
+  count(query: FilterQuery<T>): PromiseLike<number> {
+    return new Promise((resolve, reject) => {
+      super.count(query, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
   }
-  return new Proxy(raw, {
-    // target 是目标对象
-    // prop 是目标对象调用的方法
-    get(target, prop) {
-      // 模拟 promise 的 then
-      if (prop === 'then') {
-        return (resolve, reject) => {
-          target.exec((err, data) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-            resolve(data);
-          });
-        };
-      }
-      // 模拟 promise 的 catch
-      if (prop === 'catch') {
-        return (reject) => {
-          target.exec((err) => {
-            if (err) {
-              reject(err);
-            }
-          });
-        };
-      }
 
-      const propFn = target[prop];
+  countWithCursor(query: FilterQuery<T>): typeof Cursor {
+    return super.count(query);
+  }
 
-      if (typeof propFn === 'function') {
-        if (cursorFnList.includes(prop)) {
-          // 这些方法返回的是 cursor 对象，可以进行链式调用
-          return function wrap(...args) {
-            const rawFn = propFn.bind(this)(...args);
-            return proxyFn(rawFn);
-          };
+  find(query: FilterQuery<T>, projection?: ProjectionFields<T>): PromiseLike<AnyArray<T>> {
+    return new Promise((resolve, reject) => {
+      super.find(query, projection, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
         }
+      });
+    });
+  }
 
-        if (resultFnList.includes(prop)) {
-          // 这些方法执行完返回的是 undefined，必须通过回调函数获得结果
-          return function wrap(...args) {
-            // 如果有传入回调函数，则通过回调函数返回结果
-            if (typeof args[args.length - 1] === 'function') {
-              return propFn.bind(this)(...args);
-            }
-            return new Promise((resolve, reject) => {
-              propFn.bind(this)(...args, (err, ...resultArgs) => {
-                if (err) {
-                  reject(err);
-                  return;
-                }
+  findWithCursor(query: FilterQuery<T>, projection?: ProjectionFields<T>): typeof Cursor {
+    return super.find(query, projection);
+  }
 
-                if (resultArgs.length === 0) {
-                  resolve();
-                  return;
-                }
-
-                if (resultArgs.length === 1) {
-                  resolve(resultArgs[0]);
-                  return;
-                }
-
-                resolve(resultArgs);
-              });
-            });
-          };
+  findOne(query: FilterQuery<T>, projection?: ProjectionFields<T>): PromiseLike<T> {
+    return new Promise((resolve, reject) => {
+      super.findOne(query, projection, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
         }
-      }
+      });
+    });
+  }
 
-      return propFn;
-    },
-  });
-}
+  findOneWithCursor(query: FilterQuery<T>, projection?: ProjectionFields<T>): typeof Cursor {
+    return super.findOne(query, projection);
+  }
 
-interface Promisified<T> {
-  remove(query: FilterQuery<T>, options: RemoveOptions): PromiseLike<number>;
-}
+  insert(doc: T | T[]): PromiseLike<T> {
+    return new Promise((resolve, reject) => {
+      super.insert(doc, (err, ...rest) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(...rest);
+        }
+      });
+    });
+  }
 
-const ProxiedDataStore = new Proxy(DataStore, {
-  get(target, prop) {
-    const raw = target[prop];
-    if (prop === 'CURSOR_FN_LIST') return cursorFnList;
-    if (prop === 'RESULT_FN_LIST') return resultFnList;
-    return proxyFn(raw);
-  },
-});
+  remove(query: FilterQuery<T>, options?: RemoveOptions): PromiseLike<number> {
+    return new Promise((resolve, reject) => {
+      super.remove(query, options, (err, ...rest) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(...rest);
+        }
+      });
+    });
+  }
 
-export default function PromisedDataStore<T>(): Promisified<T> {
-  return new ProxiedDataStore<T>;
+  update(query: FilterQuery<T>, updateQuery: T, options?: UpdateOptions): PromiseLike<any> {
+    return new Promise((resolve, reject) => {
+      super.update(query, updateQuery, options, (err, ...rest) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(...rest);
+        }
+      });
+    });
+  }
+
+  ensureIndex(options: IndexOptions): PromiseLike<void> {
+    return new Promise((resolve, reject) => {
+      super.ensureIndex(options, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  removeIndex(fieldName: string): PromiseLike<void> {
+    return new Promise((resolve, reject) => {
+      super.removeIndex(fieldName, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  getCandidates(query: FilterQuery<T>, dontExpireStaleDocs?: boolean): PromiseLike<any> {
+    return new Promise((resolve, reject) => {
+      super.getCandidates(query, dontExpireStaleDocs, (err, ...rest) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(...rest);
+        }
+      });
+    });
+  }
+
+  loadDatabase(): PromiseLike<void> {
+    return new Promise((resolve, reject) => {
+      super.loadDatabase((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  closeDatabase(): PromiseLike<void> {
+    return new Promise((resolve, reject) => {
+      super.closeDatabase((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
 }

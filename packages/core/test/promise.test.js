@@ -7,7 +7,7 @@ chai.should();
 
 const _ = require('underscore');
 
-const Datastore = require('../lib/promise');
+const { PromisedDatastore: Datastore } = require('../lib/promise');
 
 const testDb = 'workspace/promise.db';
 

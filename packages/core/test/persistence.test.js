@@ -10,7 +10,7 @@ const [AsyncWaterfall, AsyncApply] = [require('async/waterfall'), require('async
 const child_process = require('child_process');
 const model = require('../lib/model');
 const customUtils = require('../lib/customUtils');
-const Datastore = require('../lib/datastore');
+const { Datastore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
 const storage = require('../lib/storage');
 

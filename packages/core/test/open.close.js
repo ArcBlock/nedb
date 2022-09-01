@@ -1,7 +1,7 @@
 const should = require('chai').should();
 const { assert } = require('chai');
 const [AsyncWaterfall, AsyncApply] = [require('async/waterfall'), require('async/apply')];
-const Datastore = require('../lib/datastore');
+const { Datastore } = require('../lib/datastore');
 
 const closeDb = 'workspace/close.db';
 

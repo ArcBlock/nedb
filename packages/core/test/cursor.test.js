@@ -7,7 +7,7 @@ const path = require('path');
 const _ = require('underscore');
 const [AsyncWaterfall, AsyncEach] = [require('async/waterfall'), require('async/each')];
 const model = require('../lib/model');
-const Datastore = require('../lib/datastore');
+const { Datastore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
 const Cursor = require('../lib/cursor');
 
