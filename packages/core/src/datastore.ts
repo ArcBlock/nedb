@@ -853,6 +853,7 @@ export class Datastore<T> extends EventEmitter {
       cb = options;
       options = {};
     }
+    if (!options) options = {};
     const callback = cb || function () {};
     const multi = options.multi !== undefined ? options.multi : false;
 

@@ -56,7 +56,8 @@
     "prebuild": "npm run clean",
     "build": "tsc && cp src/*.js lib/",
     "build:watch": "npm run build -- -w",
-    "test": "mocha --reporter spec --timeout 10000"
+    "test": "mocha --reporter spec --timeout 10000",
+    "test:watch": "mocha --reporter spec --timeout 1000 --watch"
   },
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
