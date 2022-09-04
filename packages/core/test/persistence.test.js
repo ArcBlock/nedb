@@ -250,9 +250,9 @@ describe('Persistence', () => {
             assert.isNull(err);
             d.loadDatabase((err) => {
               const data = d.getAllData();
-              let doc1 = _.find(data, (doc) => doc.a === 1);
-              let doc2 = _.find(data, (doc) => doc.a === 2);
-              let doc3 = _.find(data, (doc) => doc.a === 3);
+              const doc1 = _.find(data, (doc) => doc.a === 1);
+              const doc2 = _.find(data, (doc) => doc.a === 2);
+              const doc3 = _.find(data, (doc) => doc.a === 3);
               assert.isNull(err);
               data.length.should.equal(1);
               doc3.a.should.equal(3);
@@ -405,10 +405,10 @@ describe('Persistence', () => {
 
             d.ensureIndex({ fieldName: 'idefix' }, () => {
               const _data = fs.readFileSync(hookTestFilename, 'utf8');
-              let data = _data.split('\n');
-              let doc0 = bd(data[0]);
-              let doc1 = bd(data[1]);
-              let idx = bd(data[2]);
+              const data = _data.split('\n');
+              const doc0 = bd(data[0]);
+              const doc1 = bd(data[1]);
+              const idx = bd(data[2]);
               data.length.should.equal(4);
 
               data[0].substring(0, 7).should.equal('before_');
@@ -444,10 +444,10 @@ describe('Persistence', () => {
           d.update({ hello: 'world' }, { $set: { hello: 'earth' } }, {}, () => {
             d.ensureIndex({ fieldName: 'idefix' }, () => {
               const _data = fs.readFileSync(hookTestFilename, 'utf8');
-              let data = _data.split('\n');
-              let doc0 = bd(data[0]);
-              let doc1 = bd(data[1]);
-              let idx = bd(data[2]);
+              const data = _data.split('\n');
+              const doc0 = bd(data[0]);
+              const doc1 = bd(data[1]);
+              const idx = bd(data[2]);
               let _id;
 
               data.length.should.equal(4);
@@ -465,9 +465,9 @@ describe('Persistence', () => {
 
               d.persistence.persistCachedDatabase(() => {
                 const _data = fs.readFileSync(hookTestFilename, 'utf8');
-                var data = _data.split('\n');
-                var doc0 = bd(data[0]);
-                var idx = bd(data[1]);
+                const data = _data.split('\n');
+                const doc0 = bd(data[0]);
+                const idx = bd(data[1]);
                 data.length.should.equal(3);
 
                 Object.keys(doc0).length.should.equal(2);
@@ -500,12 +500,12 @@ describe('Persistence', () => {
             d.update({ hello: 'world' }, { $set: { hello: 'earth' } }, {}, () => {
               d.remove({ yo: 'ya' }, {}, () => {
                 d.ensureIndex({ fieldName: 'idefix' }, () => {
-                  let _data = fs.readFileSync(hookTestFilename, 'utf8');
-                  var data = _data.split('\n');
+                  const _data = fs.readFileSync(hookTestFilename, 'utf8');
+                  const data = _data.split('\n');
                   data.length.should.equal(6);
 
                   // Everything is deserialized correctly, including deletes and indexes
-                  let d = new Datastore({
+                  const d = new Datastore({
                     filename: hookTestFilename,
                     afterSerialization: as,
                     beforeDeserialization: bd,

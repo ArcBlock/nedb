@@ -8,18 +8,17 @@ function rethrow() {
   // is fairly slow to generate.
   if (DEBUG) {
     var backtrace = new Error();
-    return function(err) {
+    return function (err) {
       if (err) {
-        backtrace.stack = err.name + ': ' + err.message +
-                          backtrace.stack.substr(backtrace.name.length);
+        backtrace.stack = err.name + ': ' + err.message + backtrace.stack.substr(backtrace.name.length);
         throw backtrace;
       }
     };
   }
 
-  return function(err) {
+  return function (err) {
     if (err) {
-      throw err;  // Forgot a callback but don't know where? Use NODE_DEBUG=fs
+      throw err; // Forgot a callback but don't know where? Use NODE_DEBUG=fs
     }
   };
 }
@@ -29,7 +28,7 @@ function maybeCallback(cb) {
 }
 
 function isFd(path) {
-  return (path >>> 0) === path;
+  return path >>> 0 === path;
 }
 
 function assertEncoding(encoding) {
@@ -42,16 +41,18 @@ var onePassDone = false;
 function writeAll(fd, isUserFd, buffer, offset, length, position, callback_) {
   var callback = maybeCallback(arguments[arguments.length - 1]);
 
-  if (onePassDone) { process.exit(1); }   // Crash on purpose before rewrite done
-  var l = Math.min(5000, length);   // Force write by chunks of 5000 bytes to ensure data will be incomplete on crash
+  if (onePassDone) {
+    process.exit(1);
+  } // Crash on purpose before rewrite done
+  var l = Math.min(5000, length); // Force write by chunks of 5000 bytes to ensure data will be incomplete on crash
 
   // write(fd, buffer, offset, length, position, callback)
-  fs.write(fd, buffer, offset, l, position, function(writeErr, written) {
+  fs.write(fd, buffer, offset, l, position, function (writeErr, written) {
     if (writeErr) {
       if (isUserFd) {
         if (callback) callback(writeErr);
       } else {
-        fs.close(fd, function() {
+        fs.close(fd, function () {
           if (callback) callback(writeErr);
         });
       }
@@ -75,7 +76,7 @@ function writeAll(fd, isUserFd, buffer, offset, length, position, callback_) {
   });
 }
 
-fs.writeFile = function(path, data, options, callback_) {
+fs.writeFile = function (path, data, options, callback_) {
   var callback = maybeCallback(arguments[arguments.length - 1]);
 
   if (!options || typeof options === 'function') {
@@ -95,7 +96,7 @@ fs.writeFile = function(path, data, options, callback_) {
     return;
   }
 
-  fs.open(path, flag, options.mode, function(openErr, fd) {
+  fs.open(path, flag, options.mode, function (openErr, fd) {
     if (openErr) {
       if (callback) callback(openErr);
     } else {
@@ -104,20 +105,14 @@ fs.writeFile = function(path, data, options, callback_) {
   });
 
   function writeFd(fd, isUserFd) {
-    var buffer = (data instanceof Buffer) ? data : new Buffer('' + data,
-        options.encoding || 'utf8');
+    var buffer = data instanceof Buffer ? data : new Buffer('' + data, options.encoding || 'utf8');
     var position = /a/.test(flag) ? null : 0;
 
     writeAll(fd, isUserFd, buffer, 0, buffer.length, position, callback);
   }
 };
 
-
-
-
 // End of fs modification
-var Nedb = require('../lib/datastore.js')
-  , db = new Nedb({ filename: 'workspace/lac.db' })
-  ;
-
+var { Datastore: Nedb } = require('../lib/datastore.js'),
+  db = new Nedb({ filename: 'workspace/lac.db' });
 db.loadDatabase();

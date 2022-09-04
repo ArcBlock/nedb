@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-disabled-tests */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 const chai = require('chai');

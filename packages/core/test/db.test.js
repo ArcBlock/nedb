@@ -474,10 +474,10 @@ describe('Database', () => {
             d.insert({ tf: 4, an: 'other' }, (err, _doc2) => {
               d.insert({ tf: 9 }, () => {
                 d.getCandidates({ r: 6, tf: 4 }, (err, data) => {
-                  let doc1 = _.find(data, (d) => {
+                  const doc1 = _.find(data, (d) => {
                     return d._id === _doc1._id;
                   });
-                  var doc2 = _.find(data, (d) => {
+                  const doc2 = _.find(data, (d) => {
                     return d._id === _doc2._id;
                   });
                   data.length.should.equal(2);
@@ -500,10 +500,10 @@ describe('Database', () => {
             d.insert({ tf: 4, an: 'other' }, (err) => {
               d.insert({ tf: 9 }, (err, _doc2) => {
                 d.getCandidates({ r: 6, tf: { $in: [6, 9, 5] } }, (err, data) => {
-                  let doc1 = _.find(data, (d) => {
+                  const doc1 = _.find(data, (d) => {
                     return d._id === _doc1._id;
                   });
-                  var doc2 = _.find(data, (d) => {
+                  const doc2 = _.find(data, (d) => {
                     return d._id === _doc2._id;
                   });
                   data.length.should.equal(2);
@@ -526,16 +526,16 @@ describe('Database', () => {
             d.insert({ tf: 4, an: 'other' }, (err, _doc3) => {
               d.insert({ tf: 9 }, (err, _doc4) => {
                 d.getCandidates({ r: 6, notf: { $in: [6, 9, 5] } }, (err, data) => {
-                  let doc1 = _.find(data, (d) => {
+                  const doc1 = _.find(data, (d) => {
                     return d._id === _doc1._id;
                   });
-                  var doc2 = _.find(data, function (d) {
+                  const doc2 = _.find(data, function (d) {
                     return d._id === _doc2._id;
                   });
-                  var doc3 = _.find(data, function (d) {
+                  const doc3 = _.find(data, function (d) {
                     return d._id === _doc3._id;
                   });
-                  var doc4 = _.find(data, (d) => {
+                  const doc4 = _.find(data, (d) => {
                     return d._id === _doc4._id;
                   });
                   data.length.should.equal(4);
@@ -560,10 +560,10 @@ describe('Database', () => {
             d.insert({ tf: 4, an: 'other' }, (err, _doc3) => {
               d.insert({ tf: 9 }, (err, _doc4) => {
                 d.getCandidates({ r: 6, tf: { $lte: 9, $gte: 6 } }, (err, data) => {
-                  let doc2 = _.find(data, (d) => {
+                  const doc2 = _.find(data, (d) => {
                     return d._id === _doc2._id;
                   });
-                  var doc4 = _.find(data, (d) => {
+                  const doc4 = _.find(data, (d) => {
                     return d._id === _doc4._id;
                   });
                   data.length.should.equal(2);
@@ -594,12 +594,12 @@ describe('Database', () => {
 
                   d.on('compaction.done', () => {
                     // After compaction, no more mention of the document, correctly removed
-                    var datafileContents = fs.readFileSync(testDb, 'utf8');
+                    const datafileContents = fs.readFileSync(testDb, 'utf8');
                     datafileContents.split('\n').length.should.equal(2);
                     assert.isNull(datafileContents.match(/world/));
 
                     // New datastore on same datafile is empty
-                    var d2 = new Datastore({ filename: testDb, autoload: true });
+                    const d2 = new Datastore({ filename: testDb, autoload: true });
                     d2.findOne({}, function (err, doc) {
                       assert.isNull(err);
                       assert.isNull(doc);
@@ -1640,12 +1640,11 @@ describe('Database', () => {
               nr.should.equal(1);
 
               d.find({}, {}, (err, docs) => {
-                console.log('found', err, docs);
                 const d1 = _.find(docs, (doc) => doc._id === doc1._id);
-                var d2 = _.find(docs, (doc) => {
+                const d2 = _.find(docs, (doc) => {
                   return doc._id === doc2._id;
                 });
-                var d3 = _.find(docs, (doc) => doc._id === doc3._id);
+                const d3 = _.find(docs, (doc) => doc._id === doc3._id);
                 d1.a.should.equal(1);
                 d2.a.should.equal(12);
                 d3.a.should.equal(5);
@@ -1670,13 +1669,13 @@ describe('Database', () => {
               // No index modified
               _.each(d.indexes, (index) => {
                 const docs = index.getAll();
-                var d1 = _.find(docs, (doc) => {
+                const d1 = _.find(docs, (doc) => {
                   return doc._id === doc1._id;
                 });
-                var d2 = _.find(docs, (doc) => {
+                const d2 = _.find(docs, (doc) => {
                   return doc._id === doc2._id;
                 });
-                var d3 = _.find(docs, (doc) => doc._id === doc3._id);
+                const d3 = _.find(docs, (doc) => doc._id === doc3._id);
                 // All changes rolled back, including those that didn't trigger an error
                 d1.a.should.equal(4);
                 d2.a.should.equal(5);
@@ -1701,8 +1700,8 @@ describe('Database', () => {
             // Check that no index was modified
             _.each(d.indexes, (index) => {
               const docs = index.getAll();
-              let d1 = _.find(docs, (doc) => doc._id === doc1._id);
-              let d2 = _.find(docs, (doc) => doc._id === doc2._id);
+              const d1 = _.find(docs, (doc) => doc._id === doc1._id);
+              const d2 = _.find(docs, (doc) => doc._id === doc2._id);
               d1.a.should.equal(4);
               d2.a.should.equal(5);
             });
@@ -2033,10 +2032,10 @@ describe('Database', () => {
               nr.should.equal(1);
               d.find({}, (err, docs) => {
                 const d1 = _.find(docs, (doc) => doc._id === doc1._id);
-                var d2 = _.find(docs, (doc) => {
+                const d2 = _.find(docs, (doc) => {
                   return doc._id === doc2._id;
                 });
-                var d3 = _.find(docs, (doc) => doc._id === doc3._id);
+                const d3 = _.find(docs, (doc) => doc._id === doc3._id);
                 d1.a.should.equal(1);
                 assert.isUndefined(d2);
                 d3.a.should.equal(5);
@@ -2148,15 +2147,15 @@ describe('Database', () => {
 
                     // The data in the z index is correct
                     d.find({}, function (err, docs) {
-                      var doc0 = _.find(docs, function (doc) {
-                          return doc._id === 'aaa';
-                        }),
-                        doc1 = _.find(docs, function (doc) {
-                          return doc._id === newDoc1._id;
-                        }),
-                        doc2 = _.find(docs, function (doc) {
-                          return doc._id === newDoc2._id;
-                        });
+                      const doc0 = _.find(docs, function (doc) {
+                        return doc._id === 'aaa';
+                      });
+                      const doc1 = _.find(docs, function (doc) {
+                        return doc._id === newDoc1._id;
+                      });
+                      const doc2 = _.find(docs, function (doc) {
+                        return doc._id === newDoc2._id;
+                      });
                       docs.length.should.equal(3);
 
                       assert.deepEqual(doc0, { _id: 'aaa', z: '1', a: 2, ages: [1, 5, 12], yes: 'yep' });
@@ -2221,10 +2220,10 @@ describe('Database', () => {
             fs.writeFile(testDb, rawData, 'utf8', () => {
               d.loadDatabase((err) => {
                 const doc1 = _.find(d.getAllData(), (doc) => doc.z === '1');
-                var doc2 = _.find(d.getAllData(), (doc) => {
+                const doc2 = _.find(d.getAllData(), (doc) => {
                   return doc.z === '2';
                 });
-                var doc3 = _.find(d.getAllData(), (doc) => doc.z === '3');
+                const doc3 = _.find(d.getAllData(), (doc) => doc.z === '3');
                 assert.isNull(err);
                 d.getAllData().length.should.equal(3);
 
@@ -2521,8 +2520,8 @@ describe('Database', () => {
           d.insert({ a: 2, b: 'si' }, (err, _doc2) => {
             d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, nr) => {
               const data = d.getAllData();
-              let doc1 = _.find(data, (doc) => doc._id === _doc1._id);
-              let doc2 = _.find(data, (doc) => doc._id === _doc2._id);
+              const doc1 = _.find(data, (doc) => doc._id === _doc1._id);
+              const doc2 = _.find(data, (doc) => doc._id === _doc2._id);
               assert.isNull(err);
               nr.should.equal(1);
 
@@ -2532,10 +2531,10 @@ describe('Database', () => {
 
               d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, nr) => {
                 const data = d.getAllData();
-                var doc1 = _.find(data, (doc) => {
+                const doc1 = _.find(data, (doc) => {
                   return doc._id === _doc1._id;
                 });
-                var doc2 = _.find(data, (doc) => doc._id === _doc2._id);
+                const doc2 = _.find(data, (doc) => doc._id === _doc2._id);
                 assert.isNull(err);
                 nr.should.equal(2);
 
@@ -2619,13 +2618,13 @@ describe('Database', () => {
               // Will conflict with doc3
               d.update({ a: 2 }, { $inc: { a: 10, c: 1000 }, $set: { b: 30 } }, {}, (err) => {
                 const data = d.getAllData();
-                var doc1 = _.find(data, (doc) => {
+                const doc1 = _.find(data, (doc) => {
                   return doc._id === _doc1._id;
                 });
-                var doc2 = _.find(data, (doc) => {
+                const doc2 = _.find(data, (doc) => {
                   return doc._id === _doc2._id;
                 });
-                var doc3 = _.find(data, (doc) => doc._id === _doc3._id);
+                const doc3 = _.find(data, (doc) => doc._id === _doc3._id);
                 err.errorType.should.equal('uniqueViolated');
 
                 // Data left unchanged
@@ -2672,13 +2671,13 @@ describe('Database', () => {
                 { multi: true },
                 (err) => {
                   const data = d.getAllData();
-                  var doc1 = _.find(data, (doc) => {
+                  const doc1 = _.find(data, (doc) => {
                     return doc._id === _doc1._id;
                   });
-                  var doc2 = _.find(data, (doc) => {
+                  const doc2 = _.find(data, (doc) => {
                     return doc._id === _doc2._id;
                   });
-                  var doc3 = _.find(data, (doc) => doc._id === _doc3._id);
+                  const doc3 = _.find(data, (doc) => doc._id === _doc3._id);
                   err.errorType.should.equal('uniqueViolated');
 
                   // Data left unchanged
@@ -2721,10 +2720,10 @@ describe('Database', () => {
             d.insert({ a: 3, b: 'coin' }, (err, _doc3) => {
               d.remove({ a: 1 }, {}, (err, nr) => {
                 const data = d.getAllData();
-                var doc2 = _.find(data, (doc) => {
+                const doc2 = _.find(data, (doc) => {
                   return doc._id === _doc2._id;
                 });
-                var doc3 = _.find(data, (doc) => doc._id === _doc3._id);
+                const doc3 = _.find(data, (doc) => doc._id === _doc3._id);
                 assert.isNull(err);
                 nr.should.equal(1);
 
@@ -2733,7 +2732,7 @@ describe('Database', () => {
                 assert.deepEqual(doc3, { a: 3, b: 'coin', _id: _doc3._id });
 
                 d.remove({ a: { $in: [2, 3] } }, { multi: true }, (err, nr) => {
-                  let data = d.getAllData();
+                  const data = d.getAllData();
                   assert.isNull(err);
                   nr.should.equal(2);
                   data.length.should.equal(0);

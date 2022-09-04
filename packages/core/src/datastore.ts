@@ -140,14 +140,14 @@ export class Datastore<T> extends EventEmitter {
   /**
    * Load the database from the datafile, and trigger the execution of buffered commands if any
    */
-  loadDatabase(cb: CallbackOptionalError) {
+  loadDatabase(cb?: CallbackOptionalError) {
     this.executor.push({ this: this.persistence, fn: this.persistence.loadDatabase, arguments: [cb] }, true);
   }
 
   /**
    * Close the database and its underlying datafile.
    */
-  closeDatabase(cb: CallbackOptionalError) {
+  closeDatabase(cb?: CallbackOptionalError) {
     // Push the closeDatabase command onto the queue and pass the close flag to stop any further execution on the db.
     this.executor.push({ this: this.persistence, fn: this.persistence.closeDatabase, arguments: [cb] }, true, true);
   }
@@ -533,8 +533,7 @@ export class Datastore<T> extends EventEmitter {
 
   public insert(doc: T | T[], cb?: CallbackWithResult<T>) {
     debug('insert', arguments);
-    customUtils.convertObjectIdToString(doc);
-    this.executor.push({ this: this, fn: this._insert, arguments: [doc, cb] });
+    this.executor.push({ this: this, fn: this._insert, arguments });
   }
 
   /**
@@ -690,9 +689,6 @@ export class Datastore<T> extends EventEmitter {
     options?: UpdateOptions | CallbackWithResult<any>,
     cb?: CallbackWithResult<any>
   ): void {
-    customUtils.convertObjectIdToString(query);
-    customUtils.convertObjectIdToString(updateQuery);
-
     debug('_update', { query, updateQuery, options });
 
     const self = this;
@@ -756,7 +752,7 @@ export class Datastore<T> extends EventEmitter {
               return callback(err);
             }
             // @ts-ignore
-            return callback(null, 1, newDoc);
+            return callback(null, 1, newDoc, true);
           });
         });
       },
@@ -831,7 +827,7 @@ export class Datastore<T> extends EventEmitter {
     cb?: CallbackWithResult<any>
   ) {
     debug('update', arguments);
-    this.executor.push({ this: this, fn: this._update, arguments: [query, updateQuery, options, cb] });
+    this.executor.push({ this: this, fn: this._update, arguments });
   }
 
   /**
@@ -892,6 +888,6 @@ export class Datastore<T> extends EventEmitter {
     cb?: CallbackWithResult<number>
   ) {
     debug('remove', arguments);
-    this.executor.push({ this: this, fn: this._remove, arguments: [query, options, cb] });
+    this.executor.push({ this: this, fn: this._remove, arguments });
   }
 }
