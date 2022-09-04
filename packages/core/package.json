@@ -33,7 +33,8 @@
     "debug": "^4.3.4",
     "localforage": "^1.10.0",
     "mkdirp": "^1.0.4",
-    "node-line-reader": "0.0.3"
+    "node-line-reader": "0.0.3",
+    "standard-as-callback": "^2.1.0"
   },
   "devDependencies": {
     "@arcblock/eslint-config-ts": "0.2.3",

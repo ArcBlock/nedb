@@ -15,6 +15,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import EventEmitter from 'events';
+import asCallback from 'standard-as-callback';
 
 /* eslint-disable func-names */
 const util = require('util');
@@ -41,8 +42,16 @@ import {
   ProjectionFields,
   AnyArray,
   UpdateOptions,
+  UpdateResult,
   RemoveOptions,
+  NativeError,
 } from './types';
+
+type PromiseCursor = typeof Promise & typeof Cursor;
+
+const p = new Promise((resolve) => {
+  resolve(true);
+});
 
 /**
  * Create a new collection
@@ -531,9 +540,9 @@ export class Datastore<T> extends EventEmitter {
     }
   }
 
-  public insert(doc: T | T[], cb?: CallbackWithResult<T>) {
+  public insert(doc: T | T[], cb?: CallbackWithResult<T>): PromiseLike<T> {
     debug('insert', arguments);
-    this.executor.push({ this: this, fn: this._insert, arguments });
+    return this._promiseAsCallback(this._insert, Array.prototype.slice.call(arguments));
   }
 
   /**
@@ -822,12 +831,12 @@ export class Datastore<T> extends EventEmitter {
 
   public update(
     query: FilterQuery<T>,
-    updateQuery: T,
+    updateQuery: T, // FIXME: this should be updated
     options?: UpdateOptions | CallbackWithResult<any>,
     cb?: CallbackWithResult<any>
-  ) {
+  ): PromiseLike<UpdateResult<T>> {
     debug('update', arguments);
-    this.executor.push({ this: this, fn: this._update, arguments });
+    return this._promiseAsCallback(this._update, Array.prototype.slice.call(arguments));
   }
 
   /**
@@ -886,8 +895,40 @@ export class Datastore<T> extends EventEmitter {
     query: FilterQuery<T>,
     options?: RemoveOptions | CallbackWithResult<number>,
     cb?: CallbackWithResult<number>
-  ) {
+  ): PromiseLike<number> {
     debug('remove', arguments);
-    this.executor.push({ this: this, fn: this._remove, arguments });
+    return this._promiseAsCallback<number>(this._remove, Array.prototype.slice.call(arguments));
+  }
+
+  /**
+   * Supports both promise and callback functions for a public API
+   *
+   * @private
+   * @template T
+   * @param {Function} fn
+   * @param {any[]} args
+   * @return {*}  {PromiseLike<T>}
+   * @memberof Datastore
+   */
+  private _promiseAsCallback<T>(fn: any, args: any[]): PromiseLike<T> {
+    const userCb = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null;
+    const promise = new Promise<T>((resolve, reject) => {
+      const internalCb = (err: NativeError, ...rest: any[]) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rest.length > 1 ? rest : rest[0]);
+        }
+      };
+      if (userCb) {
+        args[args.length - 1] = internalCb;
+      } else {
+        args.push(internalCb);
+      }
+
+      this.executor.push({ this: this, fn, arguments: args });
+    });
+
+    return asCallback(promise, userCb);
   }
 }

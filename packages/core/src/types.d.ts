@@ -40,6 +40,8 @@ export type RemoveOptions = {
   multi?: boolean = false;
 };
 
+export type UpdateResult<T> = [number, T[], boolean];
+
 export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? U : any) | any;
 export type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
 
