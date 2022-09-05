@@ -31,7 +31,8 @@ const Executor = require('./executor');
 const Index = require('./indexes');
 const HashIndex = require('./hashIndex');
 const Persistence = require('./persistence');
-const Cursor = require('./cursor');
+
+import { Cursor } from './cursor';
 
 import {
   DatastoreOptions,
@@ -39,19 +40,14 @@ import {
   CallbackWithResult,
   IndexOptions,
   FilterQuery,
-  ProjectionFields,
-  AnyArray,
+  ProjectionQuery,
   UpdateOptions,
+  UpdateQuery,
   UpdateResult,
   RemoveOptions,
   NativeError,
+  Row,
 } from './types';
-
-type PromiseCursor = typeof Promise & typeof Cursor;
-
-const p = new Promise((resolve) => {
-  resolve(true);
-});
 
 /**
  * Create a new collection
@@ -70,17 +66,17 @@ const p = new Promise((resolve) => {
  * * compaction.done - Fired whenever a compaction operation was finished
  */
 export class Datastore<T> extends EventEmitter {
-  inMemoryOnly: boolean;
-  autoload: boolean;
-  timestampData: boolean;
-  filename: string;
+  private inMemoryOnly: boolean;
+  private autoload: boolean;
+  private timestampData: boolean;
+  private filename: string;
 
-  compareStrings: any;
-  indexes: { [key: string]: typeof Index | typeof HashIndex };
-  ttlIndexes: { [key: string]: number };
+  private compareStrings: any;
+  private indexes: { [key: string]: typeof Index | typeof HashIndex };
+  private ttlIndexes: { [key: string]: number };
 
-  persistence: typeof Persistence;
-  executor: typeof Executor;
+  private persistence: typeof Persistence;
+  private executor: typeof Executor;
 
   constructor(options: DatastoreOptions = {}) {
     super();
@@ -149,33 +145,48 @@ export class Datastore<T> extends EventEmitter {
   /**
    * Load the database from the datafile, and trigger the execution of buffered commands if any
    */
-  loadDatabase(cb?: CallbackOptionalError) {
-    this.executor.push({ this: this.persistence, fn: this.persistence.loadDatabase, arguments: [cb] }, true);
+  public loadDatabase(): PromiseLike<void>;
+  public loadDatabase(cb: CallbackOptionalError): void;
+  public loadDatabase() {
+    return this._promiseAsCallback<void>(
+      this.persistence,
+      this.persistence.loadDatabase,
+      Array.prototype.slice.call(arguments),
+      true
+    );
   }
 
   /**
    * Close the database and its underlying datafile.
    */
-  closeDatabase(cb?: CallbackOptionalError) {
+  public closeDatabase(): PromiseLike<void>;
+  public closeDatabase(cb: CallbackOptionalError): void;
+  public closeDatabase() {
     // Push the closeDatabase command onto the queue and pass the close flag to stop any further execution on the db.
-    this.executor.push({ this: this.persistence, fn: this.persistence.closeDatabase, arguments: [cb] }, true, true);
+    return this._promiseAsCallback<void>(
+      this.persistence,
+      this.persistence.closeDatabase,
+      Array.prototype.slice.call(arguments),
+      true,
+      true
+    );
   }
 
   /**
    * Get an array of all the data in the database
    */
-  getAllData() {
+  public getAllData(): T[] {
     return this.indexes._id.getAll();
   }
 
-  forEach(cb: any) {
+  public forEach(cb: any) {
     return this.indexes._id.forEach(cb);
   }
 
   /**
    * Reset all currently defined indexes
    */
-  resetIndexes(newData: any) {
+  public resetIndexes(newData: any) {
     for (const i in this.indexes) {
       this.indexes[i].reset(newData);
     }
@@ -190,8 +201,9 @@ export class Datastore<T> extends EventEmitter {
    * @param {Boolean} options.sparse
    * @param {Number} options.expireAfterSeconds - Optional, if set this index becomes a TTL index (only works on Date fields, not arrays of Date)
    * @param {Function} cb Optional callback, signature: err
+   * FIXME: promise support
    */
-  ensureIndex(options: IndexOptions, cb?: CallbackOptionalError) {
+  public ensureIndex(options: IndexOptions, cb?: CallbackOptionalError) {
     let err;
     const callback = cb || function () {};
 
@@ -230,8 +242,9 @@ export class Datastore<T> extends EventEmitter {
    * Remove an index
    * @param {String} fieldName
    * @param {Function} cb Optional callback, signature: err
+   * FIXME: promise support
    */
-  removeIndex(fieldName: string, cb?: CallbackOptionalError) {
+  public removeIndex(fieldName: string, cb?: CallbackOptionalError) {
     const callback = cb || function () {};
 
     delete this.indexes[fieldName];
@@ -247,7 +260,7 @@ export class Datastore<T> extends EventEmitter {
   /**
    * Add one or several document(s) to all indexes
    */
-  addToIndexes(doc: T) {
+  private addToIndexes(doc: T) {
     let i;
     let failingIndex;
     let error;
@@ -275,7 +288,7 @@ export class Datastore<T> extends EventEmitter {
   /**
    * Remove one or several document(s) from all indexes
    */
-  removeFromIndexes(doc: T) {
+  private removeFromIndexes(doc: T) {
     const self = this;
 
     Object.keys(this.indexes).forEach((i) => {
@@ -288,7 +301,7 @@ export class Datastore<T> extends EventEmitter {
    * To update multiple documents, oldDoc must be an array of { oldDoc, newDoc } pairs
    * If one update violates a constraint, all changes are rolled back
    */
-  updateIndexes(oldDoc: any, newDoc?: any) {
+  private updateIndexes(oldDoc: any, newDoc?: any) {
     let i;
     let failingIndex;
     let error;
@@ -319,7 +332,7 @@ export class Datastore<T> extends EventEmitter {
     }
   }
 
-  getIndex(query: FilterQuery<T>) {
+  private getIndex(query: FilterQuery<T>) {
     for (const k in query) {
       const q = query[k];
       if (typeof q === 'string' || typeof q === 'number' || typeof q === 'boolean' || q instanceof Date || q === null) {
@@ -369,11 +382,13 @@ export class Datastore<T> extends EventEmitter {
    * @param {Boolean} dontExpireStaleDocs Optional, defaults to false, if true don't remove stale docs. Useful for the remove function which shouldn't be impacted by expirations
    * @param {Function} callback Signature err, candidates
    */
-  getCandidates(
+  public getCandidates(query: FilterQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
+  public getCandidates(
     query: FilterQuery<T>,
-    dontExpireStaleDocs?: boolean | CallbackWithResult<any>,
-    callback?: CallbackWithResult<any>
-  ) {
+    dontExpireStaleDocs: boolean,
+    callback: CallbackWithResult<Row<T>[]>
+  ): void;
+  public getCandidates(query: any, dontExpireStaleDocs: any, callback?: any): any {
     if (typeof dontExpireStaleDocs === 'function') {
       callback = dontExpireStaleDocs;
       dontExpireStaleDocs = false;
@@ -443,7 +458,9 @@ export class Datastore<T> extends EventEmitter {
    * Insert a new document
    * @param {Function} cb Optional callback, signature: err, insertedDoc
    */
-  private _insert(newDoc: T | T[], cb?: CallbackWithResult<T>) {
+  private _insert(newDoc: T, cb?: CallbackWithResult<T>): void;
+  private _insert(newDoc: T[], cb?: CallbackWithResult<T>): void;
+  private _insert(newDoc: any, cb?: any): void {
     const callback = cb || function () {};
     let preparedDoc: any;
 
@@ -465,7 +482,7 @@ export class Datastore<T> extends EventEmitter {
   /**
    * Create a new _id that's not already in use
    */
-  createNewId(): string {
+  public createNewId(): string {
     let tentativeId;
     const idIndex = this.indexes._id;
     do {
@@ -479,7 +496,9 @@ export class Datastore<T> extends EventEmitter {
    * Prepare a document (or array of documents) to be inserted in a database
    * Meaning adds _id and timestamps if necessary on a copy of newDoc to avoid any side effect on user input
    */
-  prepareDocumentForInsertion(newDoc: T | T[]): T | T[] {
+  public prepareDocumentForInsertion(newDoc: T): Row<T>;
+  public prepareDocumentForInsertion(newDoc: T[]): Row<T>[];
+  public prepareDocumentForInsertion(newDoc: any): any {
     let preparedDoc;
 
     if (Array.isArray(newDoc)) {
@@ -540,16 +559,39 @@ export class Datastore<T> extends EventEmitter {
     }
   }
 
-  public insert(doc: T | T[], cb?: CallbackWithResult<T>): PromiseLike<T> {
+  public insert(doc: T): PromiseLike<T>;
+  public insert(doc: T[]): PromiseLike<T[]>;
+  public insert(doc: T, cb: CallbackWithResult<Row<T>>): void;
+  public insert(doc: T[], cb: CallbackWithResult<Row<T>>): void;
+  public insert(doc: any, cb?: any): any {
     debug('insert', arguments);
-    return this._promiseAsCallback(this._insert, Array.prototype.slice.call(arguments));
+    return this._promiseAsCallback<T>(this, this._insert, Array.prototype.slice.call(arguments));
+  }
+
+  /**
+   * Return a cursor and support a chained api style
+   */
+  public cursor(query?: FilterQuery<T>): Cursor<T> {
+    const cursor = new Cursor<T>(this, query || {}, (err: any, docs: T[], cb: CallbackWithResult<any>): void => {
+      if (err) {
+        return cb(err);
+      }
+
+      return cb(null, docs);
+    });
+
+    return cursor;
   }
 
   /**
    * Count all documents matching the query
    * @param {Object} query MongoDB-style query
    */
-  public count(query: FilterQuery<T>, callback?: CallbackWithResult<number>): typeof Cursor | void {
+  public count(): PromiseLike<number>;
+  public count(query: FilterQuery<T>): PromiseLike<number>;
+  public count(query: FilterQuery<T>, callback: CallbackWithResult<number>): void;
+  public count(callback: CallbackWithResult<number>): void;
+  public count(query?: any, callback?: any) {
     debug('count', arguments);
 
     if (typeof query === 'function') {
@@ -557,7 +599,9 @@ export class Datastore<T> extends EventEmitter {
       query = {};
     }
 
-    const cursor = new Cursor(this, query, (err: any, docs: AnyArray<T>, cb: CallbackWithResult<number>): void => {
+    const args = Array.prototype.slice.call(arguments);
+    const userCb = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null;
+    const cursor = new Cursor<T>(this, query, (err: any, docs: T[], cb: CallbackWithResult<number>): void => {
       if (err) {
         return cb(err);
       }
@@ -565,11 +609,7 @@ export class Datastore<T> extends EventEmitter {
       return cb(null, docs.length);
     });
 
-    if (typeof callback === 'function') {
-      cursor.exec(callback);
-    } else {
-      return cursor;
-    }
+    return this._cursorAsCallback<T, number>(cursor, Array.prototype.slice.call(arguments));
   }
 
   /**
@@ -578,16 +618,21 @@ export class Datastore<T> extends EventEmitter {
    * @param {Object} query MongoDB-style query
    * @param {Object} projection MongoDB-style projection
    */
-  public find(
-    query: FilterQuery<T>,
-    projection?: ProjectionFields<T> | CallbackWithResult<AnyArray<T>>,
-    callback?: CallbackWithResult<AnyArray<T>>
-  ): typeof Cursor | void {
+  public find(): PromiseLike<Row<T>[]>;
+  public find(query: FilterQuery<T>): PromiseLike<Row<T>[]>;
+  public find(query: FilterQuery<T>, projection: ProjectionQuery<T>): PromiseLike<Row<T>[]>;
+  public find(callback: CallbackWithResult<Row<T>[]>): void;
+  public find(query: FilterQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
+  public find(query: FilterQuery<T>, projection: ProjectionQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
+  public find(query?: any, projection?: any, callback?: any): any {
     debug('find', arguments);
     switch (arguments.length) {
+      case 0:
+        query = {};
+        projection = {};
+        break;
       case 1:
         projection = {};
-        // callback is undefined, will return a cursor
         break;
       case 2:
         if (typeof projection === 'function') {
@@ -598,7 +643,7 @@ export class Datastore<T> extends EventEmitter {
         break;
     }
 
-    const cursor = new Cursor(this, query, (err: any, docs: AnyArray<T>, cb: CallbackWithResult<AnyArray<T>>) => {
+    const cursor = new Cursor<T>(this, query, (err: any, docs: T[], cb: CallbackWithResult<Row<T>[]>) => {
       const res = [];
       let i;
 
@@ -613,13 +658,9 @@ export class Datastore<T> extends EventEmitter {
       return cb(null, res);
     });
 
-    cursor.projection(projection);
+    cursor.projection(projection as ProjectionQuery<T>);
 
-    if (typeof callback === 'function') {
-      cursor.exec(callback);
-    } else {
-      return cursor;
-    }
+    return this._cursorAsCallback<T, Row<T>[]>(cursor, Array.prototype.slice.call(arguments));
   }
 
   /**
@@ -627,11 +668,11 @@ export class Datastore<T> extends EventEmitter {
    * @param {Object} query MongoDB-style query
    * @param {Object} projection MongoDB-style projection
    */
-  public findOne(
-    query: FilterQuery<T>,
-    projection?: ProjectionFields<T> | CallbackWithResult<T>,
-    callback?: CallbackWithResult<T>
-  ): typeof Cursor | void {
+  public findOne(query: FilterQuery<T>): PromiseLike<Row<T>>;
+  public findOne(query: FilterQuery<T>, projection?: ProjectionQuery<T>): PromiseLike<Row<T>>;
+  public findOne(query: FilterQuery<T>, callback?: CallbackWithResult<Row<T>>): void;
+  public findOne(query: FilterQuery<T>, projection: ProjectionQuery<T>, callback: CallbackWithResult<Row<T>>): void;
+  public findOne(query: FilterQuery<T>, projection?: any, callback?: any): any {
     debug('findOne', arguments);
     switch (arguments.length) {
       case 1:
@@ -647,7 +688,7 @@ export class Datastore<T> extends EventEmitter {
         break;
     }
 
-    const cursor = new Cursor(this, query, (err: any, docs: AnyArray<T>, cb: CallbackWithResult<T>) => {
+    const cursor = new Cursor<T>(this, query, (err: any, docs: T[], cb: CallbackWithResult<T>) => {
       if (err) {
         return cb(err);
       }
@@ -659,14 +700,10 @@ export class Datastore<T> extends EventEmitter {
       return cb(null, null);
     });
 
-    cursor.projection(projection);
+    cursor.projection(projection as ProjectionQuery<T>);
     cursor.limit(1);
 
-    if (typeof callback === 'function') {
-      cursor.exec(callback);
-    } else {
-      return cursor;
-    }
+    return this._cursorAsCallback<T, T>(cursor, Array.prototype.slice.call(arguments));
   }
 
   /**
@@ -694,7 +731,7 @@ export class Datastore<T> extends EventEmitter {
    */
   private _update(
     query: FilterQuery<T>,
-    updateQuery: T,
+    updateQuery: UpdateQuery<T>,
     options?: UpdateOptions | CallbackWithResult<any>,
     cb?: CallbackWithResult<any>
   ): void {
@@ -724,7 +761,8 @@ export class Datastore<T> extends EventEmitter {
 
         // Need to use an internal function not tied to the executor to avoid deadlock
         const upsertQuery = Object.assign({}, query);
-        const cursor = new Cursor(self, upsertQuery);
+        const cursor = new Cursor<T>(self, upsertQuery);
+        // @ts-ignore
         cursor.limit(1)._exec((err: any, docs: any) => {
           if (err) {
             return callback(err);
@@ -829,14 +867,22 @@ export class Datastore<T> extends EventEmitter {
     ]);
   }
 
+  public update(query: FilterQuery<T>, updateQuery: UpdateQuery<T>): PromiseLike<UpdateResult<T>>;
+  public update(query: FilterQuery<T>, updateQuery: UpdateQuery<T>, cb: CallbackWithResult<any>): void;
   public update(
     query: FilterQuery<T>,
-    updateQuery: T, // FIXME: this should be updated
-    options?: UpdateOptions | CallbackWithResult<any>,
-    cb?: CallbackWithResult<any>
-  ): PromiseLike<UpdateResult<T>> {
+    updateQuery: UpdateQuery<T>,
+    options: UpdateOptions
+  ): PromiseLike<UpdateResult<T>>;
+  public update(
+    query: FilterQuery<T>,
+    updateQuery: UpdateQuery<T>,
+    options: UpdateOptions,
+    cb: CallbackWithResult<any>
+  ): void;
+  public update() {
     debug('update', arguments);
-    return this._promiseAsCallback(this._update, Array.prototype.slice.call(arguments));
+    return this._promiseAsCallback<UpdateResult<T>>(this, this._update, Array.prototype.slice.call(arguments));
   }
 
   /**
@@ -891,13 +937,13 @@ export class Datastore<T> extends EventEmitter {
     });
   }
 
-  public remove(
-    query: FilterQuery<T>,
-    options?: RemoveOptions | CallbackWithResult<number>,
-    cb?: CallbackWithResult<number>
-  ): PromiseLike<number> {
+  public remove(query: FilterQuery<T>): PromiseLike<number>;
+  public remove(query: FilterQuery<T>, options: RemoveOptions): PromiseLike<number>;
+  public remove(query: FilterQuery<T>, cb: CallbackWithResult<number>): void;
+  public remove(query: FilterQuery<T>, options: RemoveOptions, cb: CallbackWithResult<number>): void;
+  public remove() {
     debug('remove', arguments);
-    return this._promiseAsCallback<number>(this._remove, Array.prototype.slice.call(arguments));
+    return this._promiseAsCallback<number>(this, this._remove, Array.prototype.slice.call(arguments));
   }
 
   /**
@@ -905,12 +951,19 @@ export class Datastore<T> extends EventEmitter {
    *
    * @private
    * @template T
+   * @param {object} context
    * @param {Function} fn
    * @param {any[]} args
    * @return {*}  {PromiseLike<T>}
    * @memberof Datastore
    */
-  private _promiseAsCallback<T>(fn: any, args: any[]): PromiseLike<T> {
+  private _promiseAsCallback<T>(
+    context: any,
+    fn: Function,
+    args: any[],
+    forceQueuing?: boolean,
+    close?: boolean
+  ): PromiseLike<T> {
     const userCb = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null;
     const promise = new Promise<T>((resolve, reject) => {
       const internalCb = (err: NativeError, ...rest: any[]) => {
@@ -926,7 +979,22 @@ export class Datastore<T> extends EventEmitter {
         args.push(internalCb);
       }
 
-      this.executor.push({ this: this, fn, arguments: args });
+      this.executor.push({ this: context, fn, arguments: args }, forceQueuing, close);
+    });
+
+    return asCallback(promise, userCb);
+  }
+
+  private _cursorAsCallback<TRow, TResult>(cursor: Cursor<TRow>, args: any[]) {
+    const userCb = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null;
+    const promise = new Promise<TResult>((resolve, reject) => {
+      cursor.exec((err: NativeError, docs: any) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(docs);
+        }
+      });
     });
 
     return asCallback(promise, userCb);

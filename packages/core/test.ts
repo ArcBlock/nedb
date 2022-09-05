@@ -27,13 +27,15 @@ s.insert(
   }
 );
 
-s.find({ $or: [{ appId: '1' }, { appName: 'test' }] }, (err, docs) => {
-  console.log(docs?.map((x) => x.appId));
-});
+s.cursor().query({ appId: '1' }).limit(1).sort({ viewCount: 1 }).exec().then(console.log);
 
-p.insert({ appId: '1-p', appName: 'test-p' }).then(console.log);
+// s.find({ $or: [{ appId: '1' }, { appName: 'test' }] }, (err, docs) => {
+//   console.log(docs?.map((x) => x.appId));
+// });
 
-p.count({ viewCount: { $gt: 3, $lt: '' }, appId: '1-p' }).then(console.log);
+// p.insert({ appId: '1-p', appName: 'test-p' }).then(console.log);
+
+// p.count({ viewCount: { $gt: 3, $lt: '' }, appId: '1-p' }).then(console.log);
 
 // p.insert({
 //   appId: '1',

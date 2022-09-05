@@ -30,48 +30,72 @@ export type IndexOptions = {
   expireAfterSeconds?: number;
 };
 
+export type Row<T> = {
+  _id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+} & T;
+
+// shared
+export type LiteralUnion<LiteralType, BaseType extends Primitive> = LiteralType | (BaseType & Record<never, never>);
+export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? U : any) | any;
+export type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
+
+// update documents
 export type UpdateOptions = {
   multi?: boolean = false;
   upsert?: boolean = false;
   returnUpdatedDocs?: boolean = false;
 };
+export type UpdateResult<T> = [number, T[], boolean];
+export type UpdateQuery<T> = {
+  // https://www.npmjs.com/package/@nedb/core
+  $set?: { [P in keyof T]?: any };
+  $unset?: { [P in keyof T]?: true };
+  $inc?: { [P in keyof T]?: number };
+  $push?: { [P in keyof T]?: any };
+  $pop?: { [P in keyof T]?: SortFlag };
+  [key: string]: any;
+};
 
+// find documents
+export type SortFlag = LiteralUnion<1 | -1, number>;
+export type SortQuery<T> = { [P in keyof T]?: SortFlag };
+export type ProjectionFlag = LiteralUnion<1 | 0, number>;
+export type ProjectionQuery<T> = { [P in keyof T]?: ProjectionFlag } & Record<string, ProjectionFlag>;
+
+// remove documents
 export type RemoveOptions = {
   multi?: boolean = false;
 };
 
-export type UpdateResult<T> = [number, T[], boolean];
-
-export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? U : any) | any;
-export type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
-
 export type FilterQuery<T> = { [P in keyof T]?: Condition<T[P]> } & RootQuerySelector<T>;
-export type AnyArray<T> = T[];
-
-export type ProjectionFields<T> = { [Key in keyof T]?: any } & Record<string, any>;
-
 export type QuerySelector<T> = {
   $lt?: T;
   $lte?: T;
   $gt?: T;
   $gte?: T;
-  $in?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
-  $nin?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
+  $in?: [T] extends any[] ? Unpacked<T>[] : T[];
+  $nin?: [T] extends any[] ? Unpacked<T>[] : T[];
   $ne?: T;
 
   $exists?: boolean;
 
   $regex?: T extends string ? RegExp | string : never;
 
-  $size?: T extends AnyArray<any> ? number : never;
-  $elemMatch?: T extends AnyArray<any> ? object : never;
+  $size?: T extends any[] ? number : never;
+  $elemMatch?: T extends any[] ? object : never;
 };
-
 export type RootQuerySelector<T> = {
   $and?: Array<FilterQuery<T>>;
   $or?: Array<FilterQuery<T>>;
   $not?: Array<FilterQuery<T>>;
   $where?: Function;
+
+  $limit?: number;
+  $skip?: number;
+  $sort?: SortQuery<T>;
+  $projection?: ProjectionQuery<T>;
 
   // we could not find a proper TypeScript generic to support nested queries e.g. 'user.friends.name'
   // this will mark all unrecognized properties as any (including nested queries)
