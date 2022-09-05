@@ -260,7 +260,7 @@ export class Cursor<T> {
           resolve(docs);
         }
       };
-      if (userCb) {
+      if (userCb || (typeof args[args.length - 1] !== 'undefined' && !args[args.length - 1])) {
         args[args.length - 1] = internalCb;
       } else {
         args.push(internalCb);

@@ -982,7 +982,7 @@ export class Datastore<T> extends EventEmitter {
           resolve(returnArray ? rest : rest[0]);
         }
       };
-      if (userCb) {
+      if (userCb || (typeof args[args.length - 1] !== 'undefined' && !args[args.length - 1])) {
         args[args.length - 1] = internalCb;
       } else {
         args.push(internalCb);
