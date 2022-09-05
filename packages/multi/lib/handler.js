@@ -15,15 +15,15 @@ const replyCallback =
     reply(...args);
   };
 
-exports.create = (dbsMap) => (options, method, dataOnlyArgs, reply) => {
+exports.create = (map) => (options, method, dataOnlyArgs, reply) => {
   const { filename } = options;
-  let db = dbsMap.get(filename);
+  let db = map.get(filename);
 
   if (method === 'loadDatabase') {
     if (!db) {
       console.log(`Create database ${filename}`);
       db = new DataStore(options);
-      dbsMap.set(filename, db);
+      map.set(filename, db);
     } else {
       console.log(`Use existed database ${filename}`);
     }
@@ -37,15 +37,15 @@ exports.create = (dbsMap) => (options, method, dataOnlyArgs, reply) => {
     utils.execCursor(cursor, db, replyCallback(reply));
   } else if (method === constants.PERSISTENCE_COMPACT_DATAFILE) {
     db.persistence.compactDatafile();
-  } else if (method === constants.PERSISTENCE_SET_AUTOCOMPACTION_INTERVAL) {
-    db.persistence.setAutocompactionInterval(...dataOnlyArgs);
-  } else if (method === constants.PERSISTENCE_STOP_AUTOCOMPACTION) {
-    db.persistence.stopAutocompaction();
+  } else if (method === constants.PERSISTENCE_SET_AUTO_COMPACTION_INTERVAL) {
+    db.persistence.setAutoCompactionInterval(...dataOnlyArgs);
+  } else if (method === constants.PERSISTENCE_STOP_AUTO_COMPACTION) {
+    db.persistence.stopAutoCompaction();
   } else if (method === 'closeDatabase') {
     // always delete db from dbMap and return success
     // db.closeDatabase is not safe
     // db.closeDatabase is not atomic
-    dbsMap.delete(filename);
+    map.delete(filename);
     replyCallback(reply)(null);
 
     try {
@@ -60,7 +60,6 @@ exports.create = (dbsMap) => (options, method, dataOnlyArgs, reply) => {
       console.error(`Failed to close database ${filename}`, err.message);
     }
   } else {
-    console.log('rpc', { filename, dataOnlyArgs });
     db[method].call(db, ...dataOnlyArgs, replyCallback(reply));
   }
 };

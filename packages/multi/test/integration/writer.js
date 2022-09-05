@@ -1,18 +1,17 @@
 const DataStore = require('../../index')(Number(process.env.NEDB_MULTI_PORT));
 
 const db = new DataStore({ filename: 'test.data' });
-db.persistence.setAutocompactionInterval(500);
+db.persistence.setAutoCompactionInterval(500);
 
 db.loadDatabase(() => {
-  console.log('load database success');
   function next(count) {
-    if (count < Number(process.env.NEDB_MULTI_INTERATIONS)) {
-      db.insert({ pid: process.pid }, () => {
+    if (count < Number(process.env.NEDB_MULTI_ITERATIONS)) {
+      db.insert({ pid: process.pid }, (err, doc) => {
         db.persistence.compactDatafile();
         next(count + 1);
       });
     } else {
-      db.persistence.stopAutocompaction();
+      db.persistence.stopAutoCompaction();
       process.exit(0);
     }
   }

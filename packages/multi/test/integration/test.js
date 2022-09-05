@@ -19,6 +19,7 @@ function runProgram(program) {
 
   return new Promise((resolve, reject) => {
     const child = childProcess.exec(`node ${program}`, options, (err, res) => {
+      console.log('runProgram.done', { err, program, res });
       if (!err) {
         return resolve(res);
       }
@@ -31,8 +32,12 @@ function runProgram(program) {
 }
 
 process.on('exit', () => {
-  fs.unlinkSync(path.join(__dirname, 'test.data'));
-  children.forEach((child) => child.kill('SIGKILL'));
+  try {
+    fs.unlinkSync(path.join(__dirname, 'test.data'));
+    children.forEach((child) => child.kill('SIGKILL'));
+  } catch {
+    // Do nothing
+  }
 });
 
 process.on('unhandledRejection', (err) => {
@@ -40,15 +45,13 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
-runProgram('../../server.js');
-
 Promise.all([runProgram('writer.js'), runProgram('writer.js')])
   .then(() => runProgram('reader.js'))
   .then((output) => {
-    const [workerPid1, workerPid2] = children.slice(1).map((child) => child.pid);
+    const [workerPid1, workerPid2] = children.slice(0).map((child) => child.pid);
 
     const expected = [];
-    const iterations = Number(process.env.NEDB_MULTI_INTERATIONS);
+    const iterations = Number(process.env.NEDB_MULTI_ITERATIONS);
 
     for (let i = 0; i < iterations; i += 1) {
       expected.push({ pid: workerPid1 });

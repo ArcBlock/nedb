@@ -16,6 +16,6 @@ exports.EXECUTE_CURSOR_PRIVATE = '_nedb_multi_execCursor';
 
 exports.PERSISTENCE_COMPACT_DATAFILE = 'persistence.compactDatafile';
 
-exports.PERSISTENCE_SET_AUTOCOMPACTION_INTERVAL = 'persistence.setAutocompactionInterval';
+exports.PERSISTENCE_SET_AUTO_COMPACTION_INTERVAL = 'persistence.setAutoCompactionInterval';
 
-exports.PERSISTENCE_STOP_AUTOCOMPACTION = 'persistence.stopAutocompaction';
+exports.PERSISTENCE_STOP_AUTO_COMPACTION = 'persistence.stopAutoCompaction';

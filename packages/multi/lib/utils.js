@@ -5,10 +5,5 @@ exports.endsWithCallback = function endsWithCallback(args) {
 exports.execCursor = function execCursor(cursor, db, callback) {
   const { sort, skip, limit, projection, findArgs } = cursor;
 
-  db.find(...findArgs)
-    .sort(sort)
-    .skip(skip)
-    .limit(limit)
-    .projection(projection)
-    .exec(callback);
+  db.cursor(findArgs[0]).sort(sort).skip(skip).limit(limit).projection(projection).exec(callback);
 };

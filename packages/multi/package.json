@@ -17,7 +17,9 @@
     "prepush": "npm run test",
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "tape test/unit/**.js",
-    "test:integration": "NEDB_MULTI_INTERATIONS=10 NEDB_MULTI_PORT=5151 node test/integration/test.js"
+    "start-server": "NEDB_MULTI_PORT=5151 node server.js",
+    "test-server": "NEDB_MULTI_ITERATIONS=10 NEDB_MULTI_PORT=5151 node test/integration/test.js",
+    "test:integration": "rm test.data && start-server-and-test start-server tcp:5151 test-server"
   },
   "repository": {
     "type": "git",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "faucet": "0.0.1",
     "proxyquire": "^1.8.0",
+    "start-server-and-test": "^1.14.0",
     "tape": "^4.16.0"
   }
 }

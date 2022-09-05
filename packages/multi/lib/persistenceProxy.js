@@ -1,20 +1,18 @@
-
 const rpc = require('./rpc');
 const constants = require('./constants');
 
 module.exports = class PersistenceProxy {
-
   constructor(socket, options) {
     this.socket = socket;
     this.options = options;
   }
 
-  setAutocompactionInterval(interval) {
-    rpc(this.socket, this.options, constants.PERSISTENCE_SET_AUTOCOMPACTION_INTERVAL, [interval]);
+  setAutoCompactionInterval(interval) {
+    rpc(this.socket, this.options, constants.PERSISTENCE_SET_AUTO_COMPACTION_INTERVAL, [interval]);
   }
 
-  stopAutocompaction() {
-    rpc(this.socket, this.options, constants.PERSISTENCE_STOP_AUTOCOMPACTION);
+  stopAutoCompaction() {
+    rpc(this.socket, this.options, constants.PERSISTENCE_STOP_AUTO_COMPACTION);
   }
 
   compactDatafile() {

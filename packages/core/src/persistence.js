@@ -159,12 +159,12 @@ Persistence.prototype.compactDatafile = function (cb) {
  * Set automatic compaction every interval ms
  * @param {Number} interval in milliseconds, with an enforced minimum of 5 seconds
  */
-Persistence.prototype.setAutocompactionInterval = function (
+Persistence.prototype.setAutoCompactionInterval = function (
   interval,
   minimumWritten = 0,
   minimumBytes = Number.MAX_SAFE_INTEGER
 ) {
-  this.stopAutocompaction();
+  this.stopAutoCompaction();
 
   let currentCompactionTimer;
   const doCompaction = () => {
@@ -185,7 +185,7 @@ Persistence.prototype.setAutocompactionInterval = function (
 /**
  * Stop autocompaction (do nothing if autocompaction was not running)
  */
-Persistence.prototype.stopAutocompaction = function () {
+Persistence.prototype.stopAutoCompaction = function () {
   if (this.autocompactionIntervalId) {
     clearTimeout(this.autocompactionIntervalId);
     this.autocompactionIntervalId = null;

@@ -2,7 +2,7 @@
 
 `Nedb` (https://github.com/louischatriot/nedb) does not support concurrent access from multiple processes. One module which tries to solve this problem is `nedb-party` (https://github.com/allain/nedb-party). However, it does not support methods that return cursors. It also relies on each process starting a http server on the same port and whichever manages to start listening becomes the master and the others connect to it. This however does not work if you're using the `cluster` module (or `PM2`) as in that case the port is shared between the child processes and they are all able to become masters. I submitted a patch request, which was accepted, that instead used directory-based locking. This was enough to make it work but managing locks can be tricky.
 
-I decided to try a similar, but lock-free approach, using the `axon` framework (https://github.com/tj/axon). There's still only one master process that the others connect to, but there are no locks. Also, both callback- and cursor-based methods are supported. The `setAutocompactionInterval`, `stopAutocompaction` and `compactDatafile` methods of the `DataStore#persistence` object are also supported, except for the `compaction.done` event fired after calling `compactDatafile`.
+I decided to try a similar, but lock-free approach, using the `axon` framework (https://github.com/tj/axon). There's still only one master process that the others connect to, but there are no locks. Also, both callback- and cursor-based methods are supported. The `setAutoCompactionInterval`, `stopAutoCompaction` and `compactDatafile` methods of the `DataStore#persistence` object are also supported, except for the `compaction.done` event fired after calling `compactDatafile`.
 
 ## Installation
 
