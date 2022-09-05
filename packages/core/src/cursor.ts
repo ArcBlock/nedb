@@ -26,7 +26,7 @@ export class Cursor<T> {
 
   /**
    * Create a new cursor for this collection
-   * @param {Datastore} db - The datastore this cursor is bound to
+   * @param {DataStore} db - The datastore this cursor is bound to
    * @param {Query} query - The query this cursor will operate on
    * @param {Function} execFn - Handler to be executed after cursor has found the results and before the callback passed to find/findOne/update/remove
    */

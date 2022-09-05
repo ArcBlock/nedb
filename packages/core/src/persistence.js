@@ -3,7 +3,7 @@
 /* eslint-disable consistent-return */
 /**
  * Handle every persistence-related task
- * The interface Datastore expects to be implemented is
+ * The interface DataStore expects to be implemented is
  * * Persistence.loadDatabase(callback) and callback has signature err
  * * Persistence.persistNewState(newDocs, callback) where newDocs is an array of documents and callback has signature err
  */
@@ -20,7 +20,7 @@ const customUtils = require('./customUtils');
 
 /**
  * Create a new Persistence object for database options.db
- * @param {Datastore} options.db
+ * @param {DataStore} options.db
  * @param {Boolean} options.nodeWebkitAppName Optional, specify the name of your NW app if you want options.filename to be relative to the directory where
  *                                            Node Webkit stores application data such as cookies and local storage (the best place to store data in my opinion)
  */

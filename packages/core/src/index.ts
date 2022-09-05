@@ -1,3 +1,3 @@
-import { Datastore } from './datastore';
+import { DataStore } from './datastore';
 
-export { Datastore, Datastore as NeDB };
+export { DataStore, DataStore as NeDB };

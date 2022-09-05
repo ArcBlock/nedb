@@ -3,7 +3,7 @@ const DataStore = require('../../index')(Number(process.env.NEDB_MULTI_PORT));
 const db = new DataStore({ filename: 'test.data' });
 
 db.loadDatabase(() => {
-  db.find({})
+  db.cursor({})
     .sort({ pid: 1 })
     .projection({ _id: 0 })
     .exec((err, docs) => {

@@ -7,7 +7,7 @@ const fs = require('fs');
 const get = require('lodash/get');
 
 const model = require('../lib/model');
-const { Datastore } = require('../lib/datastore');
+const { DataStore } = require('../lib/datastore');
 
 describe('Model', () => {
   describe('Serialization, deserialization', () => {
@@ -155,14 +155,14 @@ describe('Model', () => {
         fs.unlinkSync('workspace/test1.db');
       }
       fs.existsSync('workspace/test1.db').should.equal(false);
-      db1 = new Datastore({ filename: 'workspace/test1.db' });
+      db1 = new DataStore({ filename: 'workspace/test1.db' });
 
       db1.loadDatabase((err) => {
         assert.isNull(err);
         db1.insert({ hello: badString }, (err) => {
           assert.isNull(err);
 
-          db2 = new Datastore({ filename: 'workspace/test1.db' });
+          db2 = new DataStore({ filename: 'workspace/test1.db' });
           db2.loadDatabase((err) => {
             assert.isNull(err);
             db2.find({}, (err, docs) => {

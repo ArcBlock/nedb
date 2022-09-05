@@ -4,6 +4,7 @@ const db = new DataStore({ filename: 'test.data' });
 db.persistence.setAutocompactionInterval(500);
 
 db.loadDatabase(() => {
+  console.log('load database success');
   function next(count) {
     if (count < Number(process.env.NEDB_MULTI_INTERATIONS)) {
       db.insert({ pid: process.pid }, () => {

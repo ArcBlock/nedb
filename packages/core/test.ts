@@ -1,4 +1,4 @@
-import { Datastore } from './src';
+import { DataStore } from './src';
 
 type Market = {
   appId: string;
@@ -8,7 +8,7 @@ type Market = {
   viewCount?: number;
 };
 
-const s = new Datastore<Market>({ timestampData: true });
+const s = new DataStore<Market>({ timestampData: true });
 
 (async () => {
   const newDoc = await s.insert({

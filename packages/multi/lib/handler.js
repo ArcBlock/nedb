@@ -1,17 +1,19 @@
 /* eslint-disable no-console */
-const DataStore = require('@nedb/core');
+const { DataStore } = require('@nedb/core');
 const errio = require('errio');
 
 const utils = require('./utils');
 const constants = require('./constants');
 
-const replyCallback = (reply) => (...args) => {
-  if (args[0] !== null) {
-    args[0] = errio.stringify(args[0]); // eslint-disable-line no-param-reassign
-  }
+const replyCallback =
+  (reply) =>
+  (...args) => {
+    if (args[0] !== null) {
+      args[0] = errio.stringify(args[0]); // eslint-disable-line no-param-reassign
+    }
 
-  reply(...args);
-};
+    reply(...args);
+  };
 
 exports.create = (dbsMap) => (options, method, dataOnlyArgs, reply) => {
   const { filename } = options;
@@ -58,6 +60,7 @@ exports.create = (dbsMap) => (options, method, dataOnlyArgs, reply) => {
       console.error(`Failed to close database ${filename}`, err.message);
     }
   } else {
+    console.log('rpc', { filename, dataOnlyArgs });
     db[method].call(db, ...dataOnlyArgs, replyCallback(reply));
   }
 };

@@ -41,7 +41,7 @@ It is a subset of MongoDB's API (the most used operations).
 
 ### Creating/loading a database
 
-You can use NeDB as an in-memory only datastore or as a persistent datastore. One datastore is the equivalent of a MongoDB collection. The constructor is used as follows `new Datastore(options)` where `options` is an object with the following fields:
+You can use NeDB as an in-memory only datastore or as a persistent datastore. One datastore is the equivalent of a MongoDB collection. The constructor is used as follows `new DataStore(options)` where `options` is an object with the following fields:
 
 - `filename` (optional): path to the file where the data is persisted. If left blank, the datastore is automatically considered in-memory only. It cannot end with a `~` which is used in the temporary files NeDB uses to perform crash-safe writes.
 - `inMemoryOnly` (optional, defaults to `false`): as the name implies.
@@ -66,33 +66,33 @@ Also, if `loadDatabase` fails, all commands registered to the executor afterward
 
 ```javascript
 // Type 1: In-memory only datastore (no need to load the database)
-const { Datastore } = require('@nedb/core');
-const db = new Datastore();
+const { DataStore } = require('@nedb/core');
+const db = new DataStore();
 
 // Type 2: Persistent datastore with manual loading
-const { Datastore } = require('@nedb/core');
-const db = new Datastore({ filename: 'path/to/datafile' });
+const { DataStore } = require('@nedb/core');
+const db = new DataStore({ filename: 'path/to/datafile' });
 db.loadDatabase((err) => {
   // Callback is optional
   // Now commands will be executed
 });
 
 // Type 3: Persistent datastore with automatic loading
-const { Datastore } = require('@nedb/core');
-const db = new Datastore({ filename: 'path/to/datafile', autoload: true });
+const { DataStore } = require('@nedb/core');
+const db = new DataStore({ filename: 'path/to/datafile', autoload: true });
 // You can issue commands right away
 
 // Type 4: Persistent datastore for a Node Webkit app called 'nwtest'
 // For example on Linux, the datafile will be ~/.config/nwtest/nedb-data/something.db
-const { Datastore } = require('@nedb/core');
+const { DataStore } = require('@nedb/core');
 const path = require('path');
-const db = new Datastore({ filename: path.join(require('nw.gui').App.dataPath, 'something.db') });
+const db = new DataStore({ filename: path.join(require('nw.gui').App.dataPath, 'something.db') });
 
 // Of course you can create multiple datastores if you need several
 // collections. In this case it's usually a good idea to use autoload for all collections.
 db = {};
-db.users = new Datastore('path/to/users.db');
-db.robots = new Datastore('path/to/robots.db');
+db.users = new DataStore('path/to/users.db');
+db.robots = new DataStore('path/to/robots.db');
 
 // You need to load each database (here we do it asynchronously)
 db.users.loadDatabase();
@@ -667,8 +667,8 @@ db.ensureIndex({ fieldName: 'expirationDate', expireAfterSeconds: 0 }, (err) => 
 Most database methods support promise and async/await, here are a few examples.
 
 ```javascript
-const { Datastore } = require('@nedb/core');
-const db = new Datastore({ filename: 'data.db', autoload: true });
+const { DataStore } = require('@nedb/core');
+const db = new DataStore({ filename: 'data.db', autoload: true });
 (async () => {
   const enwDoc = await db.insert({ a: '1' });
   const docs = await db.find();
@@ -682,7 +682,7 @@ const db = new Datastore({ filename: 'data.db', autoload: true });
 ## Typescript Support
 
 ```typescript
-import { Datastore } from '@nedb/core';
+import { DataStore } from '@nedb/core';
 
 type TMarket = {
   appId: string;
@@ -692,7 +692,7 @@ type TMarket = {
   viewCount?: number;
 };
 
-const s = new Datastore<TMarket>({ timestampData: true });
+const s = new DataStore<TMarket>({ timestampData: true });
 
 (async () => {
   const newDoc = await s.insert({

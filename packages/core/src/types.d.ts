@@ -4,7 +4,7 @@ export type CallbackWithResult<T = any> = (error: CallbackError, result?: T) => 
 export type CallbackWithError = (error: CallbackError) => void;
 export type CallbackOptionalError = (error?: CallbackError) => void;
 
-export type DatastoreOptions = {
+export type DataStoreOptions = {
   filename?: string = '';
   inMemoryOnly?: boolean = false;
   autoload?: boolean = false;

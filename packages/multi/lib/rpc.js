@@ -1,4 +1,3 @@
-
 const errio = require('errio');
 
 const utils = require('./utils');

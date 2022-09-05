@@ -10,7 +10,7 @@
 const bson = require('bson');
 const path = require('path');
 const MongooseCollection = require('mongoose/lib/collection');
-const DataStore = require('@nedb/core');
+const { DataStore } = require('@nedb/core');
 
 // eslint-disable-next-line global-require
 const debug = require('debug')(`${require('../package.json').name}:collection`);

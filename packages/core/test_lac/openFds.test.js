@@ -1,7 +1,7 @@
 var fs = require('fs'),
   child_process = require('child_process'),
   [AsyncWaterfall, AsyncWhilst] = [require('async/waterfall'), require('async/whilst')],
-  { Datastore: Nedb } = require('../lib/datastore'),
+  { DataStore: Nedb } = require('../lib/datastore'),
   db = new Nedb({ filename: './workspace/openfds.db', autoload: true }),
   N = 64, // Half the allowed file descriptors
   i,

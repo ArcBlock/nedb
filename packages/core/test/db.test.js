@@ -11,7 +11,7 @@ const [AsyncWaterfall, AsyncApply, AsyncEach] = [
   require('async/each'),
 ];
 const model = require('../lib/model');
-const { Datastore } = require('../lib/datastore');
+const { DataStore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
 
 const reloadTimeUpperBound = 120;
@@ -20,7 +20,7 @@ describe('Database', () => {
   let d;
 
   beforeEach((done) => {
-    d = new Datastore({ filename: testDb });
+    d = new DataStore({ filename: testDb });
     d.filename.should.equal(testDb);
     d.inMemoryOnly.should.equal(false);
 
@@ -51,22 +51,22 @@ describe('Database', () => {
 
   it('Can open and close cleanly', (done) => {
     const closeDb = 'workspace/close.db';
-    var db = new Datastore({ filename: closeDb, autoload: true });
+    var db = new DataStore({ filename: closeDb, autoload: true });
     db.filename.should.equal(closeDb);
     db.inMemoryOnly.should.equal(false);
     db.closeDatabase().then(() => done());
   });
 
   it('Constructor compatibility with v0.6-', () => {
-    var dbef = new Datastore('somefile');
+    var dbef = new DataStore('somefile');
     dbef.filename.should.equal('somefile');
     dbef.inMemoryOnly.should.equal(false);
 
-    var dbef = new Datastore('');
+    var dbef = new DataStore('');
     assert.isNull(dbef.filename);
     dbef.inMemoryOnly.should.equal(true);
 
-    var dbef = new Datastore();
+    var dbef = new DataStore();
     assert.isNull(dbef.filename);
     dbef.inMemoryOnly.should.equal(true);
   });
@@ -82,7 +82,7 @@ describe('Database', () => {
       let db;
 
       fs.writeFileSync(autoDb, fileStr, 'utf8');
-      db = new Datastore({ filename: autoDb, autoload: true });
+      db = new DataStore({ filename: autoDb, autoload: true });
 
       db.find({}, (err, docs) => {
         assert.isNull(err);
@@ -109,7 +109,7 @@ describe('Database', () => {
         done();
       }
 
-      db = new Datastore({ filename: autoDb, autoload: true, onload });
+      db = new DataStore({ filename: autoDb, autoload: true, onload });
 
       db.find({}, (err, docs) => {
         done(new Error('Find should not be executed since autoload failed'));
@@ -297,7 +297,7 @@ describe('Database', () => {
     it('If timestampData option is set, a createdAt field is added and persisted', (done) => {
       const newDoc = { hello: 'world' };
       const beginning = Date.now();
-      d = new Datastore({ filename: testDb, timestampData: true, autoload: true });
+      d = new DataStore({ filename: testDb, timestampData: true, autoload: true });
       d.find({}, (err, docs) => {
         assert.isNull(err);
         docs.length.should.equal(0);
@@ -372,7 +372,7 @@ describe('Database', () => {
     it("If timestampData is set but createdAt is specified by user, don't change it", (done) => {
       const newDoc = { hello: 'world', createdAt: new Date(234) };
       const beginning = Date.now();
-      d = new Datastore({ filename: testDb, timestampData: true, autoload: true });
+      d = new DataStore({ filename: testDb, timestampData: true, autoload: true });
       d.insert(newDoc, (err, insertedDoc) => {
         Object.keys(insertedDoc).length.should.equal(4);
         insertedDoc.createdAt.getTime().should.equal(234); // Not modified
@@ -395,7 +395,7 @@ describe('Database', () => {
     it("If timestampData is set but updatedAt is specified by user, don't change it", (done) => {
       const newDoc = { hello: 'world', updatedAt: new Date(234) };
       const beginning = Date.now();
-      d = new Datastore({ filename: testDb, timestampData: true, autoload: true });
+      d = new DataStore({ filename: testDb, timestampData: true, autoload: true });
       d.insert(newDoc, (err, insertedDoc) => {
         Object.keys(insertedDoc).length.should.equal(4);
         insertedDoc.updatedAt.getTime().should.equal(234); // Not modified
@@ -598,7 +598,7 @@ describe('Database', () => {
                     assert.isNull(datafileContents.match(/world/));
 
                     // New datastore on same datafile is empty
-                    const d2 = new Datastore({ filename: testDb, autoload: true });
+                    const d2 = new DataStore({ filename: testDb, autoload: true });
                     d2.findOne({}, function (err, doc) {
                       assert.isNull(err);
                       assert.isNull(doc);
@@ -1158,7 +1158,7 @@ describe('Database', () => {
 
     it('If timestampData option is set, update the updatedAt field', (done) => {
       const beginning = Date.now();
-      d = new Datastore({ filename: testDb, autoload: true, timestampData: true });
+      d = new DataStore({ filename: testDb, autoload: true, timestampData: true });
       d.insert({ hello: 'world' }, (err, insertedDoc) => {
         assert.isBelow(insertedDoc.updatedAt.getTime() - beginning, reloadTimeUpperBound);
         assert.isBelow(insertedDoc.createdAt.getTime() - beginning, reloadTimeUpperBound);
@@ -1766,7 +1766,7 @@ describe('Database', () => {
     });
 
     it('createdAt property is unchanged and updatedAt correct after an update, even a complete document replacement', (done) => {
-      const d2 = new Datastore({ inMemoryOnly: true, timestampData: true });
+      const d2 = new DataStore({ inMemoryOnly: true, timestampData: true });
       d2.insert({ a: 1 });
       d2.findOne({ a: 1 }, (err, doc) => {
         const createdAt = doc.createdAt.getTime();
@@ -2814,7 +2814,7 @@ describe('Database', () => {
         if (fs.existsSync(persDb)) {
           fs.writeFileSync(persDb, '', 'utf8');
         }
-        db = new Datastore({ filename: persDb, autoload: true });
+        db = new DataStore({ filename: persDb, autoload: true });
 
         Object.keys(db.indexes).length.should.equal(1);
         Object.keys(db.indexes)[0].should.equal('_id');
@@ -2833,7 +2833,7 @@ describe('Database', () => {
               db.indexes.planet.fieldName.should.equal('planet');
 
               // After a reload the indexes are recreated
-              db = new Datastore({ filename: persDb });
+              db = new DataStore({ filename: persDb });
               db.loadDatabase((err) => {
                 assert.isNull(err);
                 Object.keys(db.indexes).length.should.equal(2);
@@ -2844,7 +2844,7 @@ describe('Database', () => {
                 db.indexes.planet.fieldName.should.equal('planet');
 
                 // After another reload the indexes are still there (i.e. they are preserved during autocompaction)
-                db = new Datastore({ filename: persDb });
+                db = new DataStore({ filename: persDb });
                 db.loadDatabase((err) => {
                   assert.isNull(err);
                   Object.keys(db.indexes).length.should.equal(2);
@@ -2869,7 +2869,7 @@ describe('Database', () => {
         if (fs.existsSync(persDb)) {
           fs.writeFileSync(persDb, '', 'utf8');
         }
-        db = new Datastore({ filename: persDb, autoload: true });
+        db = new DataStore({ filename: persDb, autoload: true });
 
         Object.keys(db.indexes).length.should.equal(1);
         Object.keys(db.indexes)[0].should.equal('_id');
@@ -2892,7 +2892,7 @@ describe('Database', () => {
                 assert.isNull(err);
 
                 // After a reload the indexes are recreated
-                db = new Datastore({ filename: persDb });
+                db = new DataStore({ filename: persDb });
                 db.loadDatabase((err) => {
                   assert.isNull(err);
                   Object.keys(db.indexes).length.should.equal(2);
@@ -2918,7 +2918,7 @@ describe('Database', () => {
                     db.indexes.bloup.sparse.should.equal(true);
 
                     // After another reload the indexes are still there (i.e. they are preserved during autocompaction)
-                    db = new Datastore({ filename: persDb });
+                    db = new DataStore({ filename: persDb });
                     db.loadDatabase(function (err) {
                       assert.isNull(err);
                       Object.keys(db.indexes).length.should.equal(3);
@@ -2950,7 +2950,7 @@ describe('Database', () => {
         if (fs.existsSync(persDb)) {
           fs.writeFileSync(persDb, '', 'utf8');
         }
-        db = new Datastore({ filename: persDb, autoload: true });
+        db = new DataStore({ filename: persDb, autoload: true });
 
         Object.keys(db.indexes).length.should.equal(1);
         Object.keys(db.indexes)[0].should.equal('_id');
@@ -2973,7 +2973,7 @@ describe('Database', () => {
                 db.indexes.planet.fieldName.should.equal('planet');
 
                 // After a reload the indexes are recreated
-                db = new Datastore({ filename: persDb });
+                db = new DataStore({ filename: persDb });
                 db.loadDatabase((err) => {
                   assert.isNull(err);
                   Object.keys(db.indexes).length.should.equal(3);
@@ -2993,7 +2993,7 @@ describe('Database', () => {
                     db.indexes._id.getAll().length.should.equal(2);
 
                     // After a reload indexes are preserved
-                    db = new Datastore({ filename: persDb });
+                    db = new DataStore({ filename: persDb });
                     db.loadDatabase(function (err) {
                       assert.isNull(err);
                       Object.keys(db.indexes).length.should.equal(2);
@@ -3002,7 +3002,7 @@ describe('Database', () => {
                       db.indexes._id.getAll().length.should.equal(2);
 
                       // After another reload the indexes are still there (i.e. they are preserved during autocompaction)
-                      db = new Datastore({ filename: persDb });
+                      db = new DataStore({ filename: persDb });
                       db.loadDatabase(function (err) {
                         assert.isNull(err);
                         Object.keys(db.indexes).length.should.equal(2);

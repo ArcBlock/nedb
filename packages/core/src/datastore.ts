@@ -35,7 +35,7 @@ const Persistence = require('./persistence');
 import { Cursor } from './cursor';
 
 import {
-  DatastoreOptions,
+  DataStoreOptions,
   CallbackOptionalError,
   CallbackWithResult,
   IndexOptions,
@@ -65,7 +65,7 @@ import {
  * Event Emitter - Events
  * * compaction.done - Fired whenever a compaction operation was finished
  */
-export class Datastore<T> extends EventEmitter {
+export class DataStore<T> extends EventEmitter {
   public readonly inMemoryOnly: boolean;
   public readonly autoload: boolean;
   public readonly timestampData: boolean;
@@ -78,7 +78,7 @@ export class Datastore<T> extends EventEmitter {
   public readonly persistence: typeof Persistence;
   public readonly executor: typeof Executor;
 
-  constructor(options: DatastoreOptions = {}) {
+  constructor(options: DataStoreOptions = {}) {
     super();
 
     let filename;
@@ -963,7 +963,7 @@ export class Datastore<T> extends EventEmitter {
    * @param {Function} fn
    * @param {any[]} args
    * @return {*}  {PromiseLike<T>}
-   * @memberof Datastore
+   * @memberof DataStore
    */
   private _promiseAsCallback<T>(
     context: any,

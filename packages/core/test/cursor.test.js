@@ -8,7 +8,7 @@ const path = require('path');
 const _ = require('underscore');
 const [AsyncWaterfall, AsyncEach] = [require('async/waterfall'), require('async/each')];
 const model = require('../lib/model');
-const { Datastore } = require('../lib/datastore');
+const { DataStore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
 const { Cursor } = require('../lib/cursor');
 
@@ -16,7 +16,7 @@ describe('Cursor', () => {
   let d;
 
   beforeEach((done) => {
-    d = new Datastore({ filename: testDb });
+    d = new DataStore({ filename: testDb });
     d.filename.should.equal(testDb);
     d.inMemoryOnly.should.equal(false);
 
@@ -196,7 +196,7 @@ describe('Cursor', () => {
     });
 
     it('Sorting strings with custom string comparison function', (done) => {
-      const db = new Datastore({
+      const db = new DataStore({
         inMemoryOnly: true,
         autoload: true,
         compareStrings(a, b) {
