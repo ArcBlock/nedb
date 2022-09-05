@@ -9,3 +9,5 @@ node_modules
 
 example/example.db
 nedb/nedb-multi/file
+
+test.ts

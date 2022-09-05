@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const axon = require('axon');
 
-const handler = require('./lib/handler');
+const { createHandler } = require('./lib/handler');
 
 process
   .on('uncaughtException', (error) => {
@@ -15,7 +15,7 @@ process
 const map = new Map();
 const port = Number(process.env.NEDB_MULTI_PORT) || Number(process.argv[2]);
 const repSocket = axon.socket('rep');
-const messagesHandler = handler.create(map);
+const messagesHandler = createHandler(map);
 
 console.info(`NEDB proxy server listen on port ${port}`);
 

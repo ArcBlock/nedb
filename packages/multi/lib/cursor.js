@@ -1,44 +1,41 @@
-const rpc = require('./rpc');
-const constants = require('./constants');
-
-module.exports = class Cursor {
-  constructor(socket, options, findArgs) {
-    this.findArgs = findArgs;
-    this.options = options;
-    this.socket = socket;
-  }
-
-  sort(sort) {
-    this.sort = sort;
-    return this;
-  }
-
-  skip(skip) {
-    this.skip = skip;
-    return this;
-  }
-
-  limit(limit) {
-    this.limit = limit;
-    return this;
-  }
-
-  projection(projection) {
-    this.projection = projection;
-    return this;
-  }
-
-  toJSON() {
-    return {
-      skip: this.skip,
-      sort: this.sort,
-      limit: this.limit,
-      projection: this.projection,
-      findArgs: this.findArgs,
-    };
-  }
-
-  exec(callback) {
-    rpc(this.socket, this.options, constants.EXECUTE_CURSOR_PRIVATE, [this, callback]);
-  }
-};
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Cursor = void 0;
+const rpc_1 = require("./rpc");
+const constants_1 = require("./constants");
+class Cursor {
+    constructor(socket, options, findArgs) {
+        this._findArgs = findArgs;
+        this.options = options;
+        this.socket = socket;
+    }
+    sort(sort) {
+        this._sort = sort;
+        return this;
+    }
+    skip(skip) {
+        this._skip = skip;
+        return this;
+    }
+    limit(limit) {
+        this._limit = limit;
+        return this;
+    }
+    projection(projection) {
+        this._projection = projection;
+        return this;
+    }
+    toJSON() {
+        return {
+            skip: this._skip,
+            sort: this._sort,
+            limit: this._limit,
+            projection: this._projection,
+            findArgs: this._findArgs,
+        };
+    }
+    exec(callback) {
+        return (0, rpc_1.doRpc)(this.socket, this.options, constants_1.EXECUTE_CURSOR_PRIVATE, [this, callback]);
+    }
+}
+exports.Cursor = Cursor;

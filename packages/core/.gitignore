@@ -11,6 +11,7 @@ pids
 logs
 lib
 results
+test.ts
 
 yarn.lock
 

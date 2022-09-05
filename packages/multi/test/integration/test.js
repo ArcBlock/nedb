@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const childProcess = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -6,8 +7,8 @@ const assert = require('assert');
 const children = [];
 
 if (process.env.TRAVIS) {
-  // eslint-disable-next-line no-console
   console.log('skip integration test in travis');
+  // @ts-ignore
   return;
 }
 
