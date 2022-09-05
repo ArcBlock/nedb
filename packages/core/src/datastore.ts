@@ -883,7 +883,14 @@ export class Datastore<T> extends EventEmitter {
   ): void;
   public update() {
     debug('update', arguments);
-    return this._promiseAsCallback<UpdateResult<T>>(this, this._update, Array.prototype.slice.call(arguments));
+    return this._promiseAsCallback<UpdateResult<T>>(
+      this,
+      this._update,
+      Array.prototype.slice.call(arguments),
+      false,
+      false,
+      true
+    );
   }
 
   /**
@@ -963,7 +970,8 @@ export class Datastore<T> extends EventEmitter {
     fn: Function,
     args: any[],
     forceQueuing?: boolean,
-    close?: boolean
+    close?: boolean,
+    returnArray?: boolean
   ): PromiseLike<T> {
     const userCb = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null;
     const promise = new Promise<T>((resolve, reject) => {
@@ -971,7 +979,7 @@ export class Datastore<T> extends EventEmitter {
         if (err) {
           reject(err);
         } else {
-          resolve(rest.length > 1 ? rest : rest[0]);
+          resolve(returnArray ? rest : rest[0]);
         }
       };
       if (userCb) {

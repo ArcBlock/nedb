@@ -16,7 +16,7 @@ const Persistence = require('../lib/persistence');
 
 const reloadTimeUpperBound = 120;
 // In ms, an upper bound for the reload time used to check createdAt and updatedAt
-describe.only('Database', () => {
+describe('Database', () => {
   let d;
 
   beforeEach((done) => {
@@ -1119,7 +1119,7 @@ describe.only('Database', () => {
     });
   });
 
-  describe.only('Update', () => {
+  describe('Update', () => {
     it("If the query doesn't match anything, database is not modified", (done) => {
       AsyncWaterfall(
         [
@@ -1132,7 +1132,7 @@ describe.only('Database', () => {
           },
           function (cb) {
             // Test with query that doesn't match anything
-            d.update({ somedata: 'nope' }, { newDoc: 'yes' }, { multi: true }, (err, n) => {
+            d.update({ somedata: 'nope' }, { newDoc: 'yes' }, { multi: true }, (err, [n]) => {
               assert.isNull(err);
               n.should.equal(0);
 
@@ -1229,7 +1229,7 @@ describe.only('Database', () => {
             });
           },
           function (cb) {
-            d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: true }, (err, n) => {
+            d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: true }, (err, [n]) => {
               assert.isNull(err);
               n.should.equal(2);
               return cb();
@@ -1293,7 +1293,7 @@ describe.only('Database', () => {
           },
           function (cb) {
             // Test with query that doesn't match anything
-            d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: false }, (err, n) => {
+            d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: false }, (err, [n]) => {
               assert.isNull(err);
               n.should.equal(1);
               return cb();
@@ -1311,7 +1311,7 @@ describe.only('Database', () => {
 
     describe('Upserts', () => {
       it('Can perform upserts if needed', (done) => {
-        d.update({ impossible: 'db is empty anyway' }, { newDoc: true }, {}, (err, nr, upsert) => {
+        d.update({ impossible: 'db is empty anyway' }, { newDoc: true }, {}, (err, [nr, upsert]) => {
           assert.isNull(err);
           nr.should.equal(0);
           assert.isUndefined(upsert);
@@ -1323,7 +1323,7 @@ describe.only('Database', () => {
               { impossible: 'db is empty anyway' },
               { something: 'created ok' },
               { upsert: true },
-              (err, nr, newDoc) => {
+              (err, [nr, newDoc]) => {
                 assert.isNull(err);
                 nr.should.equal(1);
                 newDoc.something.should.equal('created ok');
@@ -1457,7 +1457,7 @@ describe.only('Database', () => {
       d.insert({ something: 'yup', other: 40 }, (err, newDoc) => {
         id = newDoc._id;
 
-        d.update({}, { $set: { something: 'changed' }, $inc: { other: 10 } }, { multi: false }, (err, nr) => {
+        d.update({}, { $set: { something: 'changed' }, $inc: { other: 10 } }, { multi: false }, (err, [nr]) => {
           assert.isNull(err);
           nr.should.equal(1);
 
@@ -1473,9 +1473,8 @@ describe.only('Database', () => {
       });
     });
 
-    it.only('Can upsert a document even with modifiers', (done) => {
-      d.update({ bloup: 'blap' }, { $set: { hello: 'world' } }, { upsert: true }, (err, nr, newDoc) => {
-        console.log(nr, newDoc);
+    it('Can upsert a document even with modifiers', (done) => {
+      d.update({ bloup: 'blap' }, { $set: { hello: 'world' } }, { upsert: true }, (err, [nr, newDoc]) => {
         assert.isNull(err);
         nr.should.equal(1);
         newDoc.bloup.should.equal('blap');
@@ -1645,7 +1644,7 @@ describe.only('Database', () => {
       d.insert({ a: 1, hello: 'world' }, (err, doc1) => {
         d.insert({ a: 2, hello: 'earth' }, (err, doc2) => {
           d.insert({ a: 5, hello: 'pluton' }, (err, doc3) => {
-            d.update({ a: 2 }, { $inc: { a: 10 } }, (err, nr) => {
+            d.update({ a: 2 }, { $inc: { a: 10 } }, (err, [nr]) => {
               assert.isNull(err);
               nr.should.equal(1);
 
@@ -1726,37 +1725,42 @@ describe.only('Database', () => {
       d.insert([{ a: 4 }, { a: 5 }, { a: 6 }], (err, docs) => {
         docs.length.should.equal(3);
 
-        d.update({ a: 7 }, { $set: { u: 1 } }, { multi: true, returnUpdatedDocs: true }, (err, num, updatedDocs) => {
+        d.update({ a: 7 }, { $set: { u: 1 } }, { multi: true, returnUpdatedDocs: true }, (err, [num, updatedDocs]) => {
           num.should.equal(0);
           updatedDocs.length.should.equal(0);
 
-          d.update({ a: 5 }, { $set: { u: 2 } }, { multi: true, returnUpdatedDocs: true }, (err, num, updatedDocs) => {
-            num.should.equal(1);
-            updatedDocs.length.should.equal(1);
-            updatedDocs[0].a.should.equal(5);
-            updatedDocs[0].u.should.equal(2);
+          d.update(
+            { a: 5 },
+            { $set: { u: 2 } },
+            { multi: true, returnUpdatedDocs: true },
+            (err, [num, updatedDocs]) => {
+              num.should.equal(1);
+              updatedDocs.length.should.equal(1);
+              updatedDocs[0].a.should.equal(5);
+              updatedDocs[0].u.should.equal(2);
 
-            d.update(
-              { a: { $in: [4, 6] } },
-              { $set: { u: 3 } },
-              { multi: true, returnUpdatedDocs: true },
-              (err, num, updatedDocs) => {
-                num.should.equal(2);
-                updatedDocs.length.should.equal(2);
-                updatedDocs[0].u.should.equal(3);
-                updatedDocs[1].u.should.equal(3);
-                if (updatedDocs[0].a === 4) {
-                  updatedDocs[0].a.should.equal(4);
-                  updatedDocs[1].a.should.equal(6);
-                } else {
-                  updatedDocs[0].a.should.equal(6);
-                  updatedDocs[1].a.should.equal(4);
+              d.update(
+                { a: { $in: [4, 6] } },
+                { $set: { u: 3 } },
+                { multi: true, returnUpdatedDocs: true },
+                (err, [num, updatedDocs]) => {
+                  num.should.equal(2);
+                  updatedDocs.length.should.equal(2);
+                  updatedDocs[0].u.should.equal(3);
+                  updatedDocs[1].u.should.equal(3);
+                  if (updatedDocs[0].a === 4) {
+                    updatedDocs[0].a.should.equal(4);
+                    updatedDocs[1].a.should.equal(6);
+                  } else {
+                    updatedDocs[0].a.should.equal(6);
+                    updatedDocs[1].a.should.equal(4);
+                  }
+
+                  done();
                 }
-
-                done();
-              }
-            );
-          });
+              );
+            }
+          );
         });
       });
     });
@@ -1795,7 +1799,7 @@ describe.only('Database', () => {
         d.insert({ a: 2 });
 
         // returnUpdatedDocs set to false
-        d.update({ a: 1 }, { $set: { b: 20 } }, {}, (err, numAffected, affectedDocuments, upsert) => {
+        d.update({ a: 1 }, { $set: { b: 20 } }, {}, (err, [numAffected, affectedDocuments, upsert]) => {
           assert.isNull(err);
           numAffected.should.equal(1);
           assert.isUndefined(affectedDocuments);
@@ -1806,7 +1810,7 @@ describe.only('Database', () => {
             { a: 1 },
             { $set: { b: 21 } },
             { returnUpdatedDocs: true },
-            (err, numAffected, affectedDocuments, upsert) => {
+            (err, [numAffected, affectedDocuments, upsert]) => {
               assert.isNull(err);
               numAffected.should.equal(1);
               affectedDocuments.a.should.equal(1);
@@ -1824,7 +1828,7 @@ describe.only('Database', () => {
         d.insert({ a: 2 });
 
         // returnUpdatedDocs set to false
-        d.update({}, { $set: { b: 20 } }, { multi: true }, (err, numAffected, affectedDocuments, upsert) => {
+        d.update({}, { $set: { b: 20 } }, { multi: true }, (err, [numAffected, affectedDocuments, upsert]) => {
           assert.isNull(err);
           numAffected.should.equal(2);
           assert.isUndefined(affectedDocuments);
@@ -1835,7 +1839,7 @@ describe.only('Database', () => {
             {},
             { $set: { b: 21 } },
             { multi: true, returnUpdatedDocs: true },
-            (err, numAffected, affectedDocuments, upsert) => {
+            (err, [numAffected, affectedDocuments, upsert]) => {
               assert.isNull(err);
               numAffected.should.equal(2);
               affectedDocuments.length.should.equal(2);
@@ -1852,14 +1856,14 @@ describe.only('Database', () => {
         d.insert({ a: 2 });
 
         // Upsert flag not set
-        d.update({ a: 3 }, { $set: { b: 20 } }, {}, (err, numAffected, affectedDocuments, upsert) => {
+        d.update({ a: 3 }, { $set: { b: 20 } }, {}, (err, [numAffected, affectedDocuments, upsert]) => {
           assert.isNull(err);
           numAffected.should.equal(0);
           assert.isUndefined(affectedDocuments);
           assert.isUndefined(upsert);
 
           // Upsert flag set
-          d.update({ a: 3 }, { $set: { b: 21 } }, { upsert: true }, (err, numAffected, affectedDocuments, upsert) => {
+          d.update({ a: 3 }, { $set: { b: 21 } }, { upsert: true }, (err, [numAffected, affectedDocuments, upsert]) => {
             assert.isNull(err);
             numAffected.should.equal(1);
             affectedDocuments.a.should.equal(3);
@@ -2528,7 +2532,7 @@ describe.only('Database', () => {
 
         d.insert({ a: 1, b: 'hello' }, (err, _doc1) => {
           d.insert({ a: 2, b: 'si' }, (err, _doc2) => {
-            d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, nr) => {
+            d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, [nr]) => {
               const data = d.getAllData();
               const doc1 = _.find(data, (doc) => doc._id === _doc1._id);
               const doc2 = _.find(data, (doc) => doc._id === _doc2._id);
@@ -2539,7 +2543,7 @@ describe.only('Database', () => {
               assert.deepEqual(doc1, { a: 456, b: 'no', _id: _doc1._id });
               assert.deepEqual(doc2, { a: 2, b: 'si', _id: _doc2._id });
 
-              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, nr) => {
+              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, [nr]) => {
                 const data = d.getAllData();
                 const doc1 = _.find(data, (doc) => {
                   return doc._id === _doc1._id;
@@ -2566,7 +2570,7 @@ describe.only('Database', () => {
         d.insert({ a: 1, b: 'hello' }, (err, doc1) => {
           d.insert({ a: 2, b: 'si' }, (err, doc2) => {
             // Simple update
-            d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, nr) => {
+            d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, [nr]) => {
               assert.isNull(err);
               nr.should.equal(1);
 
@@ -2588,7 +2592,7 @@ describe.only('Database', () => {
               d.indexes.b.getMatching('si')[0].should.equal(d.indexes._id.getMatching(doc2._id)[0]);
 
               // Multi update
-              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, nr) => {
+              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, [nr]) => {
                 assert.isNull(err);
                 nr.should.equal(2);
 
