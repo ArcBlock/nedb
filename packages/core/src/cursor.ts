@@ -4,7 +4,7 @@
 
 import asCallback from 'standard-as-callback';
 
-import { CallbackWithResult, FilterQuery, ProjectionQuery, SortQuery } from './types';
+import { CallbackWithResult, FilterQuery, ProjectionQuery, SortQuery, Row } from './types';
 
 // eslint-disable-next-line global-require
 const debug = require('debug')(`${require('../package.json').name}:cursor`);
@@ -84,8 +84,8 @@ export class Cursor<T> {
   /**
    * Apply the projection
    */
-  private _project(candidates: T[]): T[] {
-    const res: T[] = [];
+  private _project(candidates: Row<T>[]): Row<T>[] {
+    const res: Row<T>[] = [];
     const self = this;
     let keepId: any;
     let action: any;
@@ -150,8 +150,8 @@ export class Cursor<T> {
    *
    * @param {Function} callback - Signature: err, results
    */
-  private _exec(_callback: CallbackWithResult<T[]>) {
-    let res: T[] = [];
+  private _exec(_callback: CallbackWithResult<Row<T>[]>) {
+    let res: Row<T>[] = [];
     let added = 0;
     let skipped = 0;
 
@@ -246,18 +246,18 @@ export class Cursor<T> {
     });
   }
 
-  public exec(cb?: CallbackWithResult<T[]>): PromiseLike<T[]> {
-    return this._promiseAsCallback<T[]>(this, this._exec, Array.prototype.slice.call(arguments));
+  public exec(cb?: CallbackWithResult<Row<T>[]>): PromiseLike<Row<T>[]> {
+    return this._promiseAsCallback<Row<T>[]>(this, this._exec, Array.prototype.slice.call(arguments));
   }
 
   private _promiseAsCallback<T>(context: any, fn: Function, args: any[]): PromiseLike<T> {
     const userCb = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null;
     const promise = new Promise<T>((resolve, reject) => {
-      const internalCb = (err: any, ...rest: any) => {
+      const internalCb = (err: any, docs: any) => {
         if (err) {
           reject(err);
         } else {
-          resolve(rest);
+          resolve(docs);
         }
       };
       if (userCb) {

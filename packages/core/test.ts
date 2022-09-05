@@ -1,4 +1,4 @@
-import { Datastore, PromisedDatastore } from './src';
+import { Datastore } from './src';
 
 type Market = {
   appId: string;
@@ -6,38 +6,35 @@ type Market = {
   appPk?: string;
   appLink?: string;
   viewCount?: number;
-  createdAt?: string;
-  updatedAt?: string;
 };
 
 const s = new Datastore<Market>({ timestampData: true });
-const p = new PromisedDatastore<Market>({ timestampData: true });
 
-s.insert(
-  {
+(async () => {
+  const newDoc = await s.insert({
     appId: '1',
     appName: 'test',
-  },
-  (err: any, item?: Market) => {
-    if (err) {
-      console.error(err);
-    }
+  });
+  console.log(newDoc);
 
-    console.log(item);
-  }
-);
+  const docs = await s.find();
+  console.log(docs);
 
-s.cursor().query({ appId: '1' }).limit(1).sort({ viewCount: 1 }).exec().then(console.log);
+  const oldDoc = await s.findOne();
+  console.log(oldDoc);
+
+  const result = await s.cursor().query({ appId: '1' }).limit(1).exec();
+  console.log(result);
+
+  s.find({ appId: '1' }, (err, docs) => {
+    console.log(docs?.map((x) => x._id));
+  });
+
+  s.count({ appId: '1' }).then((x) => console.log(x));
+})();
+
+// s.cursor().query({ appId: '1' }).limit(1).sort({ viewCount: 1 }).exec().then(console.log);
 
 // s.find({ $or: [{ appId: '1' }, { appName: 'test' }] }, (err, docs) => {
 //   console.log(docs?.map((x) => x.appId));
 // });
-
-// p.insert({ appId: '1-p', appName: 'test-p' }).then(console.log);
-
-// p.count({ viewCount: { $gt: 3, $lt: '' }, appId: '1-p' }).then(console.log);
-
-// p.insert({
-//   appId: '1',
-//   appName: 'test',
-// }).then(console.log);

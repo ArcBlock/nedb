@@ -16,7 +16,7 @@ const Persistence = require('../lib/persistence');
 
 const reloadTimeUpperBound = 120;
 // In ms, an upper bound for the reload time used to check createdAt and updatedAt
-describe('Database', () => {
+describe.only('Database', () => {
   let d;
 
   beforeEach((done) => {
@@ -49,13 +49,12 @@ describe('Database', () => {
     );
   });
 
-  it('Can open and close cleanly', () => {
+  it('Can open and close cleanly', (done) => {
     const closeDb = 'workspace/close.db';
-    var db = new Datastore({ filename: closeDb, autoload: true }, () => {
-      db.closeDatabase();
-    });
+    var db = new Datastore({ filename: closeDb, autoload: true });
     db.filename.should.equal(closeDb);
     db.inMemoryOnly.should.equal(false);
+    db.closeDatabase().then(() => done());
   });
 
   it('Constructor compatibility with v0.6-', () => {
@@ -895,7 +894,7 @@ describe('Database', () => {
         d.insert({ a: 24, hello: 'earth' }, () => {
           d.insert({ a: 13, hello: 'blueplanet' }, () => {
             d.insert({ a: 15, hello: 'home' }, () => {
-              d.find({})
+              d.cursor({})
                 .sort({ a: 1 })
                 .limit(2)
                 .exec((err, docs) => {
@@ -917,34 +916,38 @@ describe('Database', () => {
           d.insert({ a: 13, hello: 'blueplanet' }, () => {
             d.insert({ a: 15, hello: 'home' }, () => {
               // No skip no query
-              d.findOne({})
+              d.cursor({})
                 .sort({ a: 1 })
-                .exec((err, doc) => {
+                .limit(1)
+                .exec((err, [doc]) => {
                   assert.isNull(err);
                   doc.hello.should.equal('world');
 
                   // A query
-                  d.findOne({ a: { $gt: 14 } })
+                  d.cursor({ a: { $gt: 14 } })
                     .sort({ a: 1 })
-                    .exec((err, doc) => {
+                    .limit(1)
+                    .exec((err, [doc]) => {
                       assert.isNull(err);
                       doc.hello.should.equal('home');
 
                       // And a skip
-                      d.findOne({ a: { $gt: 14 } })
+                      d.cursor({ a: { $gt: 14 } })
                         .sort({ a: 1 })
+                        .limit(1)
                         .skip(1)
-                        .exec((err, doc) => {
+                        .exec((err, [doc]) => {
                           assert.isNull(err);
                           doc.hello.should.equal('earth');
 
                           // No result
-                          d.findOne({ a: { $gt: 14 } })
+                          d.cursor({ a: { $gt: 14 } })
                             .sort({ a: 1 })
+                            .limit(1)
                             .skip(2)
-                            .exec(function (err, doc) {
+                            .exec(function (err, [doc]) {
                               assert.isNull(err);
-                              assert.isNull(doc);
+                              assert.isUndefined(doc);
 
                               done();
                             });
@@ -965,24 +968,30 @@ describe('Database', () => {
             docs.length.should.equal(1);
             assert.deepEqual(docs[0], { hello: 'world' });
 
-            d.find({ a: 2 }, { a: 0, _id: 0 }).exec((err, docs) => {
-              assert.isNull(err);
-              docs.length.should.equal(1);
-              assert.deepEqual(docs[0], { hello: 'world' });
+            d.cursor({ a: 2 })
+              .projection({ a: 0, _id: 0 })
+              .exec((err, docs) => {
+                assert.isNull(err);
+                docs.length.should.equal(1);
+                assert.deepEqual(docs[0], { hello: 'world' });
 
-              // Can't use both modes at once if not _id
-              d.find({ a: 2 }, { a: 0, hello: 1 }, (err, docs) => {
-                assert.isNotNull(err);
-                assert.isUndefined(docs);
+                // Can't use both modes at once if not _id
+                d.cursor({ a: 2 })
+                  .projection({ a: 0, hello: 1 })
+                  .exec((err, docs) => {
+                    assert.isNotNull(err);
+                    assert.isUndefined(docs);
 
-                d.find({ a: 2 }, { a: 0, hello: 1 }).exec((err, docs) => {
-                  assert.isNotNull(err);
-                  assert.isUndefined(docs);
+                    d.cursor({ a: 2 })
+                      .projection({ a: 0, hello: 1 })
+                      .exec((err, docs) => {
+                        assert.isNotNull(err);
+                        assert.isUndefined(docs);
 
-                  done();
-                });
+                        done();
+                      });
+                  });
               });
-            });
           });
         });
       });
@@ -995,7 +1004,7 @@ describe('Database', () => {
             assert.isNull(err);
             assert.deepEqual(doc, { hello: 'world' });
 
-            d.findOne({ a: 2 }, { a: 0, _id: 0 }).exec((err, doc) => {
+            d.findOne({ a: 2 }, { a: 0, _id: 0 }, (err, doc) => {
               assert.isNull(err);
               assert.deepEqual(doc, { hello: 'world' });
 
@@ -1004,7 +1013,7 @@ describe('Database', () => {
                 assert.isNotNull(err);
                 assert.isUndefined(doc);
 
-                d.findOne({ a: 2 }, { a: 0, hello: 1 }).exec((err, doc) => {
+                d.findOne({ a: 2 }, { a: 0, hello: 1 }, (err, doc) => {
                   assert.isNotNull(err);
                   assert.isUndefined(doc);
 
@@ -1110,7 +1119,7 @@ describe('Database', () => {
     });
   });
 
-  describe('Update', () => {
+  describe.only('Update', () => {
     it("If the query doesn't match anything, database is not modified", (done) => {
       AsyncWaterfall(
         [
@@ -1464,8 +1473,9 @@ describe('Database', () => {
       });
     });
 
-    it('Can upsert a document even with modifiers', (done) => {
+    it.only('Can upsert a document even with modifiers', (done) => {
       d.update({ bloup: 'blap' }, { $set: { hello: 'world' } }, { upsert: true }, (err, nr, newDoc) => {
+        console.log(nr, newDoc);
         assert.isNull(err);
         nr.should.equal(1);
         newDoc.bloup.should.equal('blap');

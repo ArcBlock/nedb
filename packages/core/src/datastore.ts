@@ -66,17 +66,17 @@ import {
  * * compaction.done - Fired whenever a compaction operation was finished
  */
 export class Datastore<T> extends EventEmitter {
-  private inMemoryOnly: boolean;
-  private autoload: boolean;
-  private timestampData: boolean;
-  private filename: string;
+  public readonly inMemoryOnly: boolean;
+  public readonly autoload: boolean;
+  public readonly timestampData: boolean;
+  public readonly filename: string;
 
-  private compareStrings: any;
-  private indexes: { [key: string]: typeof Index | typeof HashIndex };
-  private ttlIndexes: { [key: string]: number };
+  private readonly compareStrings: any;
+  private readonly indexes: { [key: string]: typeof Index | typeof HashIndex };
+  private readonly ttlIndexes: { [key: string]: number };
 
-  private persistence: typeof Persistence;
-  private executor: typeof Executor;
+  public readonly persistence: typeof Persistence;
+  public readonly executor: typeof Executor;
 
   constructor(options: DatastoreOptions = {}) {
     super();
@@ -559,10 +559,10 @@ export class Datastore<T> extends EventEmitter {
     }
   }
 
-  public insert(doc: T): PromiseLike<T>;
-  public insert(doc: T[]): PromiseLike<T[]>;
+  public insert(doc: T): PromiseLike<Row<T>>;
+  public insert(doc: T[]): PromiseLike<Row<T>[]>;
   public insert(doc: T, cb: CallbackWithResult<Row<T>>): void;
-  public insert(doc: T[], cb: CallbackWithResult<Row<T>>): void;
+  public insert(doc: T[], cb: CallbackWithResult<Row<T>[]>): void;
   public insert(doc: any, cb?: any): any {
     debug('insert', arguments);
     return this._promiseAsCallback<T>(this, this._insert, Array.prototype.slice.call(arguments));
@@ -585,10 +585,9 @@ export class Datastore<T> extends EventEmitter {
 
   /**
    * Count all documents matching the query
-   * @param {Object} query MongoDB-style query
+   * @param {Object} query FIXME: MongoDB-style query
    */
-  public count(): PromiseLike<number>;
-  public count(query: FilterQuery<T>): PromiseLike<number>;
+  public count(query?: FilterQuery<T>): PromiseLike<number>;
   public count(query: FilterQuery<T>, callback: CallbackWithResult<number>): void;
   public count(callback: CallbackWithResult<number>): void;
   public count(query?: any, callback?: any) {
@@ -615,11 +614,10 @@ export class Datastore<T> extends EventEmitter {
   /**
    * Find all documents matching the query
    * If no callback is passed, we return the cursor so that user can limit, skip and finally exec
-   * @param {Object} query MongoDB-style query
+   * @param {Object} query FIXME: MongoDB-style query
    * @param {Object} projection MongoDB-style projection
    */
-  public find(): PromiseLike<Row<T>[]>;
-  public find(query: FilterQuery<T>): PromiseLike<Row<T>[]>;
+  public find(query?: FilterQuery<T>): PromiseLike<Row<T>[]>;
   public find(query: FilterQuery<T>, projection: ProjectionQuery<T>): PromiseLike<Row<T>[]>;
   public find(callback: CallbackWithResult<Row<T>[]>): void;
   public find(query: FilterQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
@@ -665,26 +663,29 @@ export class Datastore<T> extends EventEmitter {
 
   /**
    * Find one document matching the query
-   * @param {Object} query MongoDB-style query
+   * @param {Object} query FIXME: MongoDB-style query
    * @param {Object} projection MongoDB-style projection
    */
-  public findOne(query: FilterQuery<T>): PromiseLike<Row<T>>;
+  public findOne(query?: FilterQuery<T>): PromiseLike<Row<T>>;
   public findOne(query: FilterQuery<T>, projection?: ProjectionQuery<T>): PromiseLike<Row<T>>;
   public findOne(query: FilterQuery<T>, callback?: CallbackWithResult<Row<T>>): void;
   public findOne(query: FilterQuery<T>, projection: ProjectionQuery<T>, callback: CallbackWithResult<Row<T>>): void;
-  public findOne(query: FilterQuery<T>, projection?: any, callback?: any): any {
+  public findOne(query?: FilterQuery<T>, projection?: any, callback?: any): any {
     debug('findOne', arguments);
     switch (arguments.length) {
+      case 0:
+        query = {};
+        projection = {};
+        break;
       case 1:
         projection = {};
-        // callback is undefined, will return a cursor
         break;
       case 2:
         if (typeof projection === 'function') {
           // @ts-ignore
           callback = projection;
           projection = {};
-        } // If not assume projection is an object and callback undefined
+        }
         break;
     }
 

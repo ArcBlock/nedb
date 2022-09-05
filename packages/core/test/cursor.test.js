@@ -1,3 +1,4 @@
+// @ts-nocheck
 const should = require('chai').should();
 const { assert } = require('chai');
 
@@ -9,7 +10,7 @@ const [AsyncWaterfall, AsyncEach] = [require('async/waterfall'), require('async/
 const model = require('../lib/model');
 const { Datastore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
-const Cursor = require('../lib/cursor');
+const { Cursor } = require('../lib/cursor');
 
 describe('Cursor', () => {
   let d;
@@ -207,7 +208,7 @@ describe('Cursor', () => {
       db.insert({ name: 'charlie' });
       db.insert({ name: 'zulu' });
 
-      db.find({})
+      db.cursor({})
         .sort({ name: 1 })
         .exec((err, docs) => {
           _.pluck(docs, 'name')[0].should.equal('zulu');
@@ -215,7 +216,7 @@ describe('Cursor', () => {
           _.pluck(docs, 'name')[2].should.equal('charlie');
 
           delete db.compareStrings;
-          db.find({})
+          db.cursor({})
             .sort({ name: 1 })
             .exec((err, docs) => {
               _.pluck(docs, 'name')[0].should.equal('alpha');
