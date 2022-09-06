@@ -9,6 +9,11 @@ const _ = require('underscore');
 const [AsyncWaterfall, AsyncApply] = [require('async/waterfall'), require('async/apply')];
 const { DataStore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
+
+if (process.env.CI) {
+  return;
+}
+
 // Test that even if a callback throws an exception, the next DB operations will still be executed
 // We prevent Mocha from catching the exception we throw on purpose by remembering all current handlers, remove them and register them back after test ends
 function testThrowInCallback(d, done) {
@@ -165,19 +170,17 @@ describe('Executor', () => {
       testRightOrder(d, done);
     });
 
-    if (!process.env.CI) {
-      it('Does not starve event loop and raise warning when more than 1000 callbacks are in queue', (done) => {
-        testEventLoopStarvation(d, done);
-      }).timeout(20000);
+    it('Does not starve event loop and raise warning when more than 1000 callbacks are in queue', (done) => {
+      testEventLoopStarvation(d, done);
+    }).timeout(20000);
 
-      it('Works in the right order even with no supplied callback', (done) => {
-        testExecutorWorksWithoutCallback(d, done);
-      });
+    it('Works in the right order even with no supplied callback', (done) => {
+      testExecutorWorksWithoutCallback(d, done);
+    });
 
-      it('A throw in a callback doesnt prevent execution of next operations', (done) => {
-        testThrowInCallback(d, done);
-      });
-    }
+    it('A throw in a callback doesnt prevent execution of next operations', (done) => {
+      testThrowInCallback(d, done);
+    });
   }); // ==== End of 'With persistent database' ====
 
   describe.skip('With non persistent database', () => {
