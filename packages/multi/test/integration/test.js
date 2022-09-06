@@ -1,17 +1,18 @@
+/* eslint-disable no-console */
 const childProcess = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 
-const children = [];
-
-if (process.env.TRAVIS) {
-  // eslint-disable-next-line no-console
-  console.log('skip integration test in travis');
+if (process.env.CI) {
+  // @ts-ignore
   return;
 }
 
-function runProgram(program) {
+const pids = {};
+const children = [];
+
+function runProgram(program, label) {
   const options = {
     cwd: __dirname,
     env: process.env,
@@ -19,6 +20,10 @@ function runProgram(program) {
 
   return new Promise((resolve, reject) => {
     const child = childProcess.exec(`node ${program}`, options, (err, res) => {
+      console.log('runProgram.done', { err, program, res });
+
+      pids[label] = child.pid;
+
       if (!err) {
         return resolve(res);
       }
@@ -31,8 +36,12 @@ function runProgram(program) {
 }
 
 process.on('exit', () => {
-  fs.unlinkSync(path.join(__dirname, 'test.data'));
-  children.forEach((child) => child.kill('SIGKILL'));
+  try {
+    fs.unlinkSync(path.join(__dirname, 'test.data'));
+    children.forEach((child) => child.kill('SIGKILL'));
+  } catch {
+    // Do nothing
+  }
 });
 
 process.on('unhandledRejection', (err) => {
@@ -40,22 +49,18 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
-runProgram('../../server.js');
-
-Promise.all([runProgram('writer.js'), runProgram('writer.js')])
-  .then(() => runProgram('reader.js'))
+Promise.all([runProgram('writer.js', 'writer1'), runProgram('writer.js', 'writer2')])
+  .then(() => runProgram('reader.js', 'reader1'))
   .then((output) => {
-    const [workerPid1, workerPid2] = children.slice(1).map((child) => child.pid);
-
     const expected = [];
-    const iterations = Number(process.env.NEDB_MULTI_INTERATIONS);
+    const iterations = Number(process.env.NEDB_MULTI_ITERATIONS);
 
     for (let i = 0; i < iterations; i += 1) {
-      expected.push({ pid: workerPid1 });
+      expected.push({ pid: pids.writer1 });
     }
 
     for (let i = 0; i < iterations; i += 1) {
-      expected.push({ pid: workerPid2 });
+      expected.push({ pid: pids.writer2 });
     }
 
     const actual = JSON.parse(output);

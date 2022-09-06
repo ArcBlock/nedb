@@ -1,10 +1,11 @@
 {
   "name": "@nedb/multi",
   "author": "Vladimir Angelov, wangshijun",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "files": [
     "lib",
     "example",
-    "index.js",
     "server.js"
   ],
   "publishConfig": {
@@ -16,8 +17,16 @@
     "precommit": "npm run test",
     "prepush": "npm run test",
     "test": "npm run test:unit && npm run test:integration",
-    "test:unit": "tape test/unit/**.js",
-    "test:integration": "NEDB_MULTI_INTERATIONS=10 NEDB_MULTI_PORT=5151 node test/integration/test.js"
+    "test:unit": "nyc tape test/unit/**.js | tap-nyc",
+    "start-server": "NEDB_MULTI_PORT=5151 node server.js",
+    "test-server": "NEDB_MULTI_ITERATIONS=10 NEDB_MULTI_PORT=5151 node test/integration/test.js",
+    "test:integration": "rm -f test.data && start-server-and-test start-server tcp:5151 test-server",
+    "lint": "eslint src test",
+    "lint:fix": "npm run lint -- --fix",
+    "clean": "rm -fr lib",
+    "prebuild": "npm run clean",
+    "build": "tsc",
+    "build:watch": "tsc -w"
   },
   "repository": {
     "type": "git",
@@ -30,11 +39,20 @@
   "dependencies": {
     "@nedb/core": "1.3.4",
     "axon": "^2.0.3",
-    "errio": "^1.2.2"
+    "errio": "^1.2.2",
+    "standard-as-callback": "^2.1.0"
   },
   "devDependencies": {
+    "@arcblock/eslint-config-ts": "0.2.3",
+    "@types/axon": "^2.0.2",
+    "@types/node": "^17.0.45",
+    "eslint": "^8.23.0",
     "faucet": "0.0.1",
-    "proxyquire": "^1.7.11",
-    "tape": "^4.6.3"
+    "nyc": "^15.1.0",
+    "proxyquire": "^1.8.0",
+    "start-server-and-test": "^1.14.0",
+    "tap-nyc": "^1.0.3",
+    "tape": "^4.16.0",
+    "typescript": "^4.8.2"
   }
 }

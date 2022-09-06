@@ -1,0 +1,57 @@
+name: Integration
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  CACHE_VERSION: 20220905
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  Integration:
+    runs-on: ubuntu-latest
+
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip ci]')"
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Use Node.js v16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Cache local node_modules
+        uses: actions/cache@v2
+        id: node_modules-cache
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-node-modules-${{env.CACHE_VERSION}}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-${{env.CACHE_VERSION}}
+
+      - name: Init
+        run: |
+          lerna bootstrap
+          lerna link
+          lerna run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build Typescript
+        run: npm run build
+
+      - name: Run Tests
+        run: npm run test
+
+      - name: Report coverage
+        uses: ArcBlock/code-coverage-assistant@v1.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          monorepo-base-path: './packages'

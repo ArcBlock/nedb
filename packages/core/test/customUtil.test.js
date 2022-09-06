@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/filename-case */
 const customUtils = require('../lib/customUtils');
 
 describe('customUtils', () => {

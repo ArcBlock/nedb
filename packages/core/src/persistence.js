@@ -1,9 +1,10 @@
+// @ts-nocheck
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable func-names */
 /* eslint-disable consistent-return */
 /**
  * Handle every persistence-related task
- * The interface Datastore expects to be implemented is
+ * The interface DataStore expects to be implemented is
  * * Persistence.loadDatabase(callback) and callback has signature err
  * * Persistence.persistNewState(newDocs, callback) where newDocs is an array of documents and callback has signature err
  */
@@ -20,7 +21,7 @@ const customUtils = require('./customUtils');
 
 /**
  * Create a new Persistence object for database options.db
- * @param {Datastore} options.db
+ * @param {DataStore} options.db
  * @param {Boolean} options.nodeWebkitAppName Optional, specify the name of your NW app if you want options.filename to be relative to the directory where
  *                                            Node Webkit stores application data such as cookies and local storage (the best place to store data in my opinion)
  */
@@ -101,6 +102,7 @@ Persistence.prototype.persistCachedDatabase = function (reopen, cb) {
   const stream = fs.createWriteStream(tempFile);
 
   let fd = null;
+  // eslint-disable-next-line no-return-assign
   stream.on('open', (_fd) => (fd = _fd));
 
   this.db.forEach((doc) => stream.write(`${this.afterSerialization(doc)}\n`));
@@ -159,18 +161,21 @@ Persistence.prototype.compactDatafile = function (cb) {
  * Set automatic compaction every interval ms
  * @param {Number} interval in milliseconds, with an enforced minimum of 5 seconds
  */
-Persistence.prototype.setAutocompactionInterval = function (
+Persistence.prototype.setAutoCompactionInterval = function (
   interval,
   minimumWritten = 0,
   minimumBytes = Number.MAX_SAFE_INTEGER
 ) {
-  this.stopAutocompaction();
+  this.stopAutoCompaction();
+
+  const realInterval = Math.max(interval || 0, 5000);
 
   let currentCompactionTimer;
   const doCompaction = () => {
     currentCompactionTimer = this.autocompactionIntervalId;
     if (this.writtenCount >= minimumWritten || this.writtenBytes > minimumBytes) {
       this.compactDatafile(() => {
+        // eslint-disable-next-line no-multi-assign
         this.writtenCount = this.writtenBytes = 0;
         if (currentCompactionTimer == this.autocompactionIntervalId)
           this.autocompactionIntervalId = setTimeout(doCompaction, realInterval);
@@ -178,14 +183,13 @@ Persistence.prototype.setAutocompactionInterval = function (
     }
   };
 
-  const realInterval = Math.max(interval || 0, 5000);
   this.autocompactionIntervalId = setTimeout(doCompaction, realInterval);
 };
 
 /**
  * Stop autocompaction (do nothing if autocompaction was not running)
  */
-Persistence.prototype.stopAutocompaction = function () {
+Persistence.prototype.stopAutoCompaction = function () {
   if (this.autocompactionIntervalId) {
     clearTimeout(this.autocompactionIntervalId);
     this.autocompactionIntervalId = null;
@@ -251,6 +255,7 @@ Persistence.prototype.readFileAndParse = function (cb) {
       );
     }
 
+    // eslint-disable-next-line guard-for-in
     for (const k in dataById) {
       tdata.push(dataById[k]);
     }
@@ -318,6 +323,7 @@ Persistence.prototype.treatRawData = function (rawData) {
     );
   }
 
+  // eslint-disable-next-line guard-for-in
   for (const k in dataById) {
     tdata.push(dataById[k]);
   }
@@ -387,6 +393,7 @@ Persistence.prototype.loadDatabase = function (cb) {
                 }
 
                 // Recreate all indexes in the datafile
+                // eslint-disable-next-line guard-for-in
                 for (const key in treatedData.indexes) {
                   this.db.indexes[key] = new Index(treatedData.indexes[key]);
                 }

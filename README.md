@@ -2,10 +2,11 @@
 
 ## Table of Contents
 
-- [Table of Contents](#Table-of-Contents)
-- [Introduction](#Introduction)
-- [Packages](#Packages)
-- [License](#License)
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
+- [Packages](#packages)
+- [Credits](#credits)
 
 ## Introduction
 
@@ -21,7 +22,7 @@ Along with the NEDB core, we have updated several related packages to improve pe
 
 - Most dependencies are upgraded to latest to get better security and performance
 - Use @nedb/multi to read and write to the same database in different node.js processes
-- Use @nedb/mongoose-driver as a drop-in replacement for mongoose + mongodb to make apps lightweight
+- Use @nedb/mongoose-driver [deprecated and not working anymore] as a drop-in replacement for mongoose + mongodb to make apps lightweight
 
 Limitations: if you want to use nedb in browser, please use the original version.
 
@@ -40,4 +41,3 @@ Checkout instructions [here](./docs/contribute.md) on how to contribute.
 
 - [NEDB Core](https://github.com/louischatriot/nedb)
 - [NEDB Multi](https://github.com/vangelov/nedb-multi)
-

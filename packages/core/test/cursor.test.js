@@ -1,3 +1,4 @@
+// @ts-nocheck
 const should = require('chai').should();
 const { assert } = require('chai');
 
@@ -7,15 +8,15 @@ const path = require('path');
 const _ = require('underscore');
 const [AsyncWaterfall, AsyncEach] = [require('async/waterfall'), require('async/each')];
 const model = require('../lib/model');
-const Datastore = require('../lib/datastore');
+const { DataStore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
-const Cursor = require('../lib/cursor');
+const { Cursor } = require('../lib/cursor');
 
 describe('Cursor', () => {
   let d;
 
   beforeEach((done) => {
-    d = new Datastore({ filename: testDb });
+    d = new DataStore({ filename: testDb });
     d.filename.should.equal(testDb);
     d.inMemoryOnly.should.equal(false);
 
@@ -195,7 +196,7 @@ describe('Cursor', () => {
     });
 
     it('Sorting strings with custom string comparison function', (done) => {
-      const db = new Datastore({
+      const db = new DataStore({
         inMemoryOnly: true,
         autoload: true,
         compareStrings(a, b) {
@@ -207,7 +208,7 @@ describe('Cursor', () => {
       db.insert({ name: 'charlie' });
       db.insert({ name: 'zulu' });
 
-      db.find({})
+      db.cursor({})
         .sort({ name: 1 })
         .exec((err, docs) => {
           _.pluck(docs, 'name')[0].should.equal('zulu');
@@ -215,7 +216,7 @@ describe('Cursor', () => {
           _.pluck(docs, 'name')[2].should.equal('charlie');
 
           delete db.compareStrings;
-          db.find({})
+          db.cursor({})
             .sort({ name: 1 })
             .exec((err, docs) => {
               _.pluck(docs, 'name')[0].should.equal('alpha');

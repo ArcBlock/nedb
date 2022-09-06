@@ -11,7 +11,7 @@ const [AsyncWaterfall, AsyncApply, AsyncEach] = [
   require('async/each'),
 ];
 const model = require('../lib/model');
-const Datastore = require('../lib/datastore');
+const { DataStore } = require('../lib/datastore');
 const Persistence = require('../lib/persistence');
 
 const reloadTimeUpperBound = 120;
@@ -20,7 +20,7 @@ describe('Database', () => {
   let d;
 
   beforeEach((done) => {
-    d = new Datastore({ filename: testDb });
+    d = new DataStore({ filename: testDb });
     d.filename.should.equal(testDb);
     d.inMemoryOnly.should.equal(false);
 
@@ -49,25 +49,24 @@ describe('Database', () => {
     );
   });
 
-  it('Can open and close cleanly', () => {
+  it('Can open and close cleanly', (done) => {
     const closeDb = 'workspace/close.db';
-    var db = new Datastore({ filename: closeDb, autoload: true }, () => {
-      db.closeDatabase();
-    });
+    let db = new DataStore({ filename: closeDb, autoload: true });
     db.filename.should.equal(closeDb);
     db.inMemoryOnly.should.equal(false);
+    db.closeDatabase().then(() => done());
   });
 
   it('Constructor compatibility with v0.6-', () => {
-    var dbef = new Datastore('somefile');
+    let dbef = new DataStore('somefile');
     dbef.filename.should.equal('somefile');
     dbef.inMemoryOnly.should.equal(false);
 
-    var dbef = new Datastore('');
+    dbef = new DataStore('');
     assert.isNull(dbef.filename);
     dbef.inMemoryOnly.should.equal(true);
 
-    var dbef = new Datastore();
+    dbef = new DataStore();
     assert.isNull(dbef.filename);
     dbef.inMemoryOnly.should.equal(true);
   });
@@ -83,7 +82,7 @@ describe('Database', () => {
       let db;
 
       fs.writeFileSync(autoDb, fileStr, 'utf8');
-      db = new Datastore({ filename: autoDb, autoload: true });
+      db = new DataStore({ filename: autoDb, autoload: true });
 
       db.find({}, (err, docs) => {
         assert.isNull(err);
@@ -98,7 +97,7 @@ describe('Database', () => {
           _id: '2',
           a: 5,
           planet: 'Mars',
-        })}\n` + '{"$$indexCreated":{"fieldName":"a","unique":true}}';
+        })}\n` + '{"$$indexCreated":{"fieldName":"a","unique":true}}'; // eslint-disable-line
       const autoDb = 'workspace/auto.db';
       let db;
 
@@ -110,7 +109,7 @@ describe('Database', () => {
         done();
       }
 
-      db = new Datastore({ filename: autoDb, autoload: true, onload });
+      db = new DataStore({ filename: autoDb, autoload: true, onload });
 
       db.find({}, (err, docs) => {
         done(new Error('Find should not be executed since autoload failed'));
@@ -298,7 +297,7 @@ describe('Database', () => {
     it('If timestampData option is set, a createdAt field is added and persisted', (done) => {
       const newDoc = { hello: 'world' };
       const beginning = Date.now();
-      d = new Datastore({ filename: testDb, timestampData: true, autoload: true });
+      d = new DataStore({ filename: testDb, timestampData: true, autoload: true });
       d.find({}, (err, docs) => {
         assert.isNull(err);
         docs.length.should.equal(0);
@@ -373,7 +372,7 @@ describe('Database', () => {
     it("If timestampData is set but createdAt is specified by user, don't change it", (done) => {
       const newDoc = { hello: 'world', createdAt: new Date(234) };
       const beginning = Date.now();
-      d = new Datastore({ filename: testDb, timestampData: true, autoload: true });
+      d = new DataStore({ filename: testDb, timestampData: true, autoload: true });
       d.insert(newDoc, (err, insertedDoc) => {
         Object.keys(insertedDoc).length.should.equal(4);
         insertedDoc.createdAt.getTime().should.equal(234); // Not modified
@@ -396,7 +395,7 @@ describe('Database', () => {
     it("If timestampData is set but updatedAt is specified by user, don't change it", (done) => {
       const newDoc = { hello: 'world', updatedAt: new Date(234) };
       const beginning = Date.now();
-      d = new Datastore({ filename: testDb, timestampData: true, autoload: true });
+      d = new DataStore({ filename: testDb, timestampData: true, autoload: true });
       d.insert(newDoc, (err, insertedDoc) => {
         Object.keys(insertedDoc).length.should.equal(4);
         insertedDoc.updatedAt.getTime().should.equal(234); // Not modified
@@ -474,10 +473,10 @@ describe('Database', () => {
             d.insert({ tf: 4, an: 'other' }, (err, _doc2) => {
               d.insert({ tf: 9 }, () => {
                 d.getCandidates({ r: 6, tf: 4 }, (err, data) => {
-                  let doc1 = _.find(data, (d) => {
+                  const doc1 = _.find(data, (d) => {
                     return d._id === _doc1._id;
                   });
-                  var doc2 = _.find(data, (d) => {
+                  const doc2 = _.find(data, (d) => {
                     return d._id === _doc2._id;
                   });
                   data.length.should.equal(2);
@@ -500,10 +499,10 @@ describe('Database', () => {
             d.insert({ tf: 4, an: 'other' }, (err) => {
               d.insert({ tf: 9 }, (err, _doc2) => {
                 d.getCandidates({ r: 6, tf: { $in: [6, 9, 5] } }, (err, data) => {
-                  let doc1 = _.find(data, (d) => {
+                  const doc1 = _.find(data, (d) => {
                     return d._id === _doc1._id;
                   });
-                  var doc2 = _.find(data, (d) => {
+                  const doc2 = _.find(data, (d) => {
                     return d._id === _doc2._id;
                   });
                   data.length.should.equal(2);
@@ -526,16 +525,16 @@ describe('Database', () => {
             d.insert({ tf: 4, an: 'other' }, (err, _doc3) => {
               d.insert({ tf: 9 }, (err, _doc4) => {
                 d.getCandidates({ r: 6, notf: { $in: [6, 9, 5] } }, (err, data) => {
-                  let doc1 = _.find(data, (d) => {
+                  const doc1 = _.find(data, (d) => {
                     return d._id === _doc1._id;
                   });
-                  var doc2 = _.find(data, function (d) {
+                  const doc2 = _.find(data, function (d) {
                     return d._id === _doc2._id;
                   });
-                  var doc3 = _.find(data, function (d) {
+                  const doc3 = _.find(data, function (d) {
                     return d._id === _doc3._id;
                   });
-                  var doc4 = _.find(data, (d) => {
+                  const doc4 = _.find(data, (d) => {
                     return d._id === _doc4._id;
                   });
                   data.length.should.equal(4);
@@ -560,10 +559,10 @@ describe('Database', () => {
             d.insert({ tf: 4, an: 'other' }, (err, _doc3) => {
               d.insert({ tf: 9 }, (err, _doc4) => {
                 d.getCandidates({ r: 6, tf: { $lte: 9, $gte: 6 } }, (err, data) => {
-                  let doc2 = _.find(data, (d) => {
+                  const doc2 = _.find(data, (d) => {
                     return d._id === _doc2._id;
                   });
-                  var doc4 = _.find(data, (d) => {
+                  const doc4 = _.find(data, (d) => {
                     return d._id === _doc4._id;
                   });
                   data.length.should.equal(2);
@@ -594,12 +593,12 @@ describe('Database', () => {
 
                   d.on('compaction.done', () => {
                     // After compaction, no more mention of the document, correctly removed
-                    var datafileContents = fs.readFileSync(testDb, 'utf8');
+                    const datafileContents = fs.readFileSync(testDb, 'utf8');
                     datafileContents.split('\n').length.should.equal(2);
                     assert.isNull(datafileContents.match(/world/));
 
                     // New datastore on same datafile is empty
-                    var d2 = new Datastore({ filename: testDb, autoload: true });
+                    const d2 = new DataStore({ filename: testDb, autoload: true });
                     d2.findOne({}, function (err, doc) {
                       assert.isNull(err);
                       assert.isNull(doc);
@@ -895,7 +894,7 @@ describe('Database', () => {
         d.insert({ a: 24, hello: 'earth' }, () => {
           d.insert({ a: 13, hello: 'blueplanet' }, () => {
             d.insert({ a: 15, hello: 'home' }, () => {
-              d.find({})
+              d.cursor({})
                 .sort({ a: 1 })
                 .limit(2)
                 .exec((err, docs) => {
@@ -917,34 +916,38 @@ describe('Database', () => {
           d.insert({ a: 13, hello: 'blueplanet' }, () => {
             d.insert({ a: 15, hello: 'home' }, () => {
               // No skip no query
-              d.findOne({})
+              d.cursor({})
                 .sort({ a: 1 })
-                .exec((err, doc) => {
+                .limit(1)
+                .exec((err, [doc]) => {
                   assert.isNull(err);
                   doc.hello.should.equal('world');
 
                   // A query
-                  d.findOne({ a: { $gt: 14 } })
+                  d.cursor({ a: { $gt: 14 } })
                     .sort({ a: 1 })
-                    .exec((err, doc) => {
+                    .limit(1)
+                    .exec((err, [doc]) => {
                       assert.isNull(err);
                       doc.hello.should.equal('home');
 
                       // And a skip
-                      d.findOne({ a: { $gt: 14 } })
+                      d.cursor({ a: { $gt: 14 } })
                         .sort({ a: 1 })
+                        .limit(1)
                         .skip(1)
-                        .exec((err, doc) => {
+                        .exec((err, [doc]) => {
                           assert.isNull(err);
                           doc.hello.should.equal('earth');
 
                           // No result
-                          d.findOne({ a: { $gt: 14 } })
+                          d.cursor({ a: { $gt: 14 } })
                             .sort({ a: 1 })
+                            .limit(1)
                             .skip(2)
-                            .exec(function (err, doc) {
+                            .exec(function (err, [doc]) {
                               assert.isNull(err);
-                              assert.isNull(doc);
+                              assert.isUndefined(doc);
 
                               done();
                             });
@@ -965,24 +968,30 @@ describe('Database', () => {
             docs.length.should.equal(1);
             assert.deepEqual(docs[0], { hello: 'world' });
 
-            d.find({ a: 2 }, { a: 0, _id: 0 }).exec((err, docs) => {
-              assert.isNull(err);
-              docs.length.should.equal(1);
-              assert.deepEqual(docs[0], { hello: 'world' });
+            d.cursor({ a: 2 })
+              .projection({ a: 0, _id: 0 })
+              .exec((err, docs) => {
+                assert.isNull(err);
+                docs.length.should.equal(1);
+                assert.deepEqual(docs[0], { hello: 'world' });
 
-              // Can't use both modes at once if not _id
-              d.find({ a: 2 }, { a: 0, hello: 1 }, (err, docs) => {
-                assert.isNotNull(err);
-                assert.isUndefined(docs);
+                // Can't use both modes at once if not _id
+                d.cursor({ a: 2 })
+                  .projection({ a: 0, hello: 1 })
+                  .exec((err, docs) => {
+                    assert.isNotNull(err);
+                    assert.isUndefined(docs);
 
-                d.find({ a: 2 }, { a: 0, hello: 1 }).exec((err, docs) => {
-                  assert.isNotNull(err);
-                  assert.isUndefined(docs);
+                    d.cursor({ a: 2 })
+                      .projection({ a: 0, hello: 1 })
+                      .exec((err, docs) => {
+                        assert.isNotNull(err);
+                        assert.isUndefined(docs);
 
-                  done();
-                });
+                        done();
+                      });
+                  });
               });
-            });
           });
         });
       });
@@ -995,7 +1004,7 @@ describe('Database', () => {
             assert.isNull(err);
             assert.deepEqual(doc, { hello: 'world' });
 
-            d.findOne({ a: 2 }, { a: 0, _id: 0 }).exec((err, doc) => {
+            d.findOne({ a: 2 }, { a: 0, _id: 0 }, (err, doc) => {
               assert.isNull(err);
               assert.deepEqual(doc, { hello: 'world' });
 
@@ -1004,7 +1013,7 @@ describe('Database', () => {
                 assert.isNotNull(err);
                 assert.isUndefined(doc);
 
-                d.findOne({ a: 2 }, { a: 0, hello: 1 }).exec((err, doc) => {
+                d.findOne({ a: 2 }, { a: 0, hello: 1 }, (err, doc) => {
                   assert.isNotNull(err);
                   assert.isUndefined(doc);
 
@@ -1123,7 +1132,7 @@ describe('Database', () => {
           },
           function (cb) {
             // Test with query that doesn't match anything
-            d.update({ somedata: 'nope' }, { newDoc: 'yes' }, { multi: true }, (err, n) => {
+            d.update({ somedata: 'nope' }, { newDoc: 'yes' }, { multi: true }, (err, [n]) => {
               assert.isNull(err);
               n.should.equal(0);
 
@@ -1149,7 +1158,7 @@ describe('Database', () => {
 
     it('If timestampData option is set, update the updatedAt field', (done) => {
       const beginning = Date.now();
-      d = new Datastore({ filename: testDb, autoload: true, timestampData: true });
+      d = new DataStore({ filename: testDb, autoload: true, timestampData: true });
       d.insert({ hello: 'world' }, (err, insertedDoc) => {
         assert.isBelow(insertedDoc.updatedAt.getTime() - beginning, reloadTimeUpperBound);
         assert.isBelow(insertedDoc.createdAt.getTime() - beginning, reloadTimeUpperBound);
@@ -1220,7 +1229,7 @@ describe('Database', () => {
             });
           },
           function (cb) {
-            d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: true }, (err, n) => {
+            d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: true }, (err, [n]) => {
               assert.isNull(err);
               n.should.equal(2);
               return cb();
@@ -1284,7 +1293,7 @@ describe('Database', () => {
           },
           function (cb) {
             // Test with query that doesn't match anything
-            d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: false }, (err, n) => {
+            d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: false }, (err, [n]) => {
               assert.isNull(err);
               n.should.equal(1);
               return cb();
@@ -1302,7 +1311,7 @@ describe('Database', () => {
 
     describe('Upserts', () => {
       it('Can perform upserts if needed', (done) => {
-        d.update({ impossible: 'db is empty anyway' }, { newDoc: true }, {}, (err, nr, upsert) => {
+        d.update({ impossible: 'db is empty anyway' }, { newDoc: true }, {}, (err, [nr, upsert]) => {
           assert.isNull(err);
           nr.should.equal(0);
           assert.isUndefined(upsert);
@@ -1314,7 +1323,7 @@ describe('Database', () => {
               { impossible: 'db is empty anyway' },
               { something: 'created ok' },
               { upsert: true },
-              (err, nr, newDoc) => {
+              (err, [nr, newDoc]) => {
                 assert.isNull(err);
                 nr.should.equal(1);
                 newDoc.something.should.equal('created ok');
@@ -1448,7 +1457,7 @@ describe('Database', () => {
       d.insert({ something: 'yup', other: 40 }, (err, newDoc) => {
         id = newDoc._id;
 
-        d.update({}, { $set: { something: 'changed' }, $inc: { other: 10 } }, { multi: false }, (err, nr) => {
+        d.update({}, { $set: { something: 'changed' }, $inc: { other: 10 } }, { multi: false }, (err, [nr]) => {
           assert.isNull(err);
           nr.should.equal(1);
 
@@ -1465,7 +1474,7 @@ describe('Database', () => {
     });
 
     it('Can upsert a document even with modifiers', (done) => {
-      d.update({ bloup: 'blap' }, { $set: { hello: 'world' } }, { upsert: true }, (err, nr, newDoc) => {
+      d.update({ bloup: 'blap' }, { $set: { hello: 'world' } }, { upsert: true }, (err, [nr, newDoc]) => {
         assert.isNull(err);
         nr.should.equal(1);
         newDoc.bloup.should.equal('blap');
@@ -1635,15 +1644,16 @@ describe('Database', () => {
       d.insert({ a: 1, hello: 'world' }, (err, doc1) => {
         d.insert({ a: 2, hello: 'earth' }, (err, doc2) => {
           d.insert({ a: 5, hello: 'pluton' }, (err, doc3) => {
-            d.update({ a: 2 }, { $inc: { a: 10 } }, (err, nr) => {
+            d.update({ a: 2 }, { $inc: { a: 10 } }, (err, [nr]) => {
               assert.isNull(err);
               nr.should.equal(1);
-              d.find({}, (err, docs) => {
+
+              d.find({}, {}, (err, docs) => {
                 const d1 = _.find(docs, (doc) => doc._id === doc1._id);
-                var d2 = _.find(docs, (doc) => {
+                const d2 = _.find(docs, (doc) => {
                   return doc._id === doc2._id;
                 });
-                var d3 = _.find(docs, (doc) => doc._id === doc3._id);
+                const d3 = _.find(docs, (doc) => doc._id === doc3._id);
                 d1.a.should.equal(1);
                 d2.a.should.equal(12);
                 d3.a.should.equal(5);
@@ -1668,13 +1678,13 @@ describe('Database', () => {
               // No index modified
               _.each(d.indexes, (index) => {
                 const docs = index.getAll();
-                var d1 = _.find(docs, (doc) => {
+                const d1 = _.find(docs, (doc) => {
                   return doc._id === doc1._id;
                 });
-                var d2 = _.find(docs, (doc) => {
+                const d2 = _.find(docs, (doc) => {
                   return doc._id === doc2._id;
                 });
-                var d3 = _.find(docs, (doc) => doc._id === doc3._id);
+                const d3 = _.find(docs, (doc) => doc._id === doc3._id);
                 // All changes rolled back, including those that didn't trigger an error
                 d1.a.should.equal(4);
                 d2.a.should.equal(5);
@@ -1699,8 +1709,8 @@ describe('Database', () => {
             // Check that no index was modified
             _.each(d.indexes, (index) => {
               const docs = index.getAll();
-              let d1 = _.find(docs, (doc) => doc._id === doc1._id);
-              let d2 = _.find(docs, (doc) => doc._id === doc2._id);
+              const d1 = _.find(docs, (doc) => doc._id === doc1._id);
+              const d2 = _.find(docs, (doc) => doc._id === doc2._id);
               d1.a.should.equal(4);
               d2.a.should.equal(5);
             });
@@ -1715,43 +1725,48 @@ describe('Database', () => {
       d.insert([{ a: 4 }, { a: 5 }, { a: 6 }], (err, docs) => {
         docs.length.should.equal(3);
 
-        d.update({ a: 7 }, { $set: { u: 1 } }, { multi: true, returnUpdatedDocs: true }, (err, num, updatedDocs) => {
+        d.update({ a: 7 }, { $set: { u: 1 } }, { multi: true, returnUpdatedDocs: true }, (err, [num, updatedDocs]) => {
           num.should.equal(0);
           updatedDocs.length.should.equal(0);
 
-          d.update({ a: 5 }, { $set: { u: 2 } }, { multi: true, returnUpdatedDocs: true }, (err, num, updatedDocs) => {
-            num.should.equal(1);
-            updatedDocs.length.should.equal(1);
-            updatedDocs[0].a.should.equal(5);
-            updatedDocs[0].u.should.equal(2);
+          d.update(
+            { a: 5 },
+            { $set: { u: 2 } },
+            { multi: true, returnUpdatedDocs: true },
+            (err, [num, updatedDocs]) => {
+              num.should.equal(1);
+              updatedDocs.length.should.equal(1);
+              updatedDocs[0].a.should.equal(5);
+              updatedDocs[0].u.should.equal(2);
 
-            d.update(
-              { a: { $in: [4, 6] } },
-              { $set: { u: 3 } },
-              { multi: true, returnUpdatedDocs: true },
-              (err, num, updatedDocs) => {
-                num.should.equal(2);
-                updatedDocs.length.should.equal(2);
-                updatedDocs[0].u.should.equal(3);
-                updatedDocs[1].u.should.equal(3);
-                if (updatedDocs[0].a === 4) {
-                  updatedDocs[0].a.should.equal(4);
-                  updatedDocs[1].a.should.equal(6);
-                } else {
-                  updatedDocs[0].a.should.equal(6);
-                  updatedDocs[1].a.should.equal(4);
+              d.update(
+                { a: { $in: [4, 6] } },
+                { $set: { u: 3 } },
+                { multi: true, returnUpdatedDocs: true },
+                (err, [num, updatedDocs]) => {
+                  num.should.equal(2);
+                  updatedDocs.length.should.equal(2);
+                  updatedDocs[0].u.should.equal(3);
+                  updatedDocs[1].u.should.equal(3);
+                  if (updatedDocs[0].a === 4) {
+                    updatedDocs[0].a.should.equal(4);
+                    updatedDocs[1].a.should.equal(6);
+                  } else {
+                    updatedDocs[0].a.should.equal(6);
+                    updatedDocs[1].a.should.equal(4);
+                  }
+
+                  done();
                 }
-
-                done();
-              }
-            );
-          });
+              );
+            }
+          );
         });
       });
     });
 
     it('createdAt property is unchanged and updatedAt correct after an update, even a complete document replacement', (done) => {
-      const d2 = new Datastore({ inMemoryOnly: true, timestampData: true });
+      const d2 = new DataStore({ inMemoryOnly: true, timestampData: true });
       d2.insert({ a: 1 });
       d2.findOne({ a: 1 }, (err, doc) => {
         const createdAt = doc.createdAt.getTime();
@@ -1784,7 +1799,7 @@ describe('Database', () => {
         d.insert({ a: 2 });
 
         // returnUpdatedDocs set to false
-        d.update({ a: 1 }, { $set: { b: 20 } }, {}, (err, numAffected, affectedDocuments, upsert) => {
+        d.update({ a: 1 }, { $set: { b: 20 } }, {}, (err, [numAffected, affectedDocuments, upsert]) => {
           assert.isNull(err);
           numAffected.should.equal(1);
           assert.isUndefined(affectedDocuments);
@@ -1795,7 +1810,7 @@ describe('Database', () => {
             { a: 1 },
             { $set: { b: 21 } },
             { returnUpdatedDocs: true },
-            (err, numAffected, affectedDocuments, upsert) => {
+            (err, [numAffected, affectedDocuments, upsert]) => {
               assert.isNull(err);
               numAffected.should.equal(1);
               affectedDocuments.a.should.equal(1);
@@ -1813,7 +1828,7 @@ describe('Database', () => {
         d.insert({ a: 2 });
 
         // returnUpdatedDocs set to false
-        d.update({}, { $set: { b: 20 } }, { multi: true }, (err, numAffected, affectedDocuments, upsert) => {
+        d.update({}, { $set: { b: 20 } }, { multi: true }, (err, [numAffected, affectedDocuments, upsert]) => {
           assert.isNull(err);
           numAffected.should.equal(2);
           assert.isUndefined(affectedDocuments);
@@ -1824,7 +1839,7 @@ describe('Database', () => {
             {},
             { $set: { b: 21 } },
             { multi: true, returnUpdatedDocs: true },
-            (err, numAffected, affectedDocuments, upsert) => {
+            (err, [numAffected, affectedDocuments, upsert]) => {
               assert.isNull(err);
               numAffected.should.equal(2);
               affectedDocuments.length.should.equal(2);
@@ -1841,14 +1856,14 @@ describe('Database', () => {
         d.insert({ a: 2 });
 
         // Upsert flag not set
-        d.update({ a: 3 }, { $set: { b: 20 } }, {}, (err, numAffected, affectedDocuments, upsert) => {
+        d.update({ a: 3 }, { $set: { b: 20 } }, {}, (err, [numAffected, affectedDocuments, upsert]) => {
           assert.isNull(err);
           numAffected.should.equal(0);
           assert.isUndefined(affectedDocuments);
           assert.isUndefined(upsert);
 
           // Upsert flag set
-          d.update({ a: 3 }, { $set: { b: 21 } }, { upsert: true }, (err, numAffected, affectedDocuments, upsert) => {
+          d.update({ a: 3 }, { $set: { b: 21 } }, { upsert: true }, (err, [numAffected, affectedDocuments, upsert]) => {
             assert.isNull(err);
             numAffected.should.equal(1);
             affectedDocuments.a.should.equal(3);
@@ -2031,10 +2046,10 @@ describe('Database', () => {
               nr.should.equal(1);
               d.find({}, (err, docs) => {
                 const d1 = _.find(docs, (doc) => doc._id === doc1._id);
-                var d2 = _.find(docs, (doc) => {
+                const d2 = _.find(docs, (doc) => {
                   return doc._id === doc2._id;
                 });
-                var d3 = _.find(docs, (doc) => doc._id === doc3._id);
+                const d3 = _.find(docs, (doc) => doc._id === doc3._id);
                 d1.a.should.equal(1);
                 assert.isUndefined(d2);
                 d3.a.should.equal(5);
@@ -2146,15 +2161,15 @@ describe('Database', () => {
 
                     // The data in the z index is correct
                     d.find({}, function (err, docs) {
-                      var doc0 = _.find(docs, function (doc) {
-                          return doc._id === 'aaa';
-                        }),
-                        doc1 = _.find(docs, function (doc) {
-                          return doc._id === newDoc1._id;
-                        }),
-                        doc2 = _.find(docs, function (doc) {
-                          return doc._id === newDoc2._id;
-                        });
+                      const doc0 = _.find(docs, function (doc) {
+                        return doc._id === 'aaa';
+                      });
+                      const doc1 = _.find(docs, function (doc) {
+                        return doc._id === newDoc1._id;
+                      });
+                      const doc2 = _.find(docs, function (doc) {
+                        return doc._id === newDoc2._id;
+                      });
                       docs.length.should.equal(3);
 
                       assert.deepEqual(doc0, { _id: 'aaa', z: '1', a: 2, ages: [1, 5, 12], yes: 'yep' });
@@ -2219,10 +2234,10 @@ describe('Database', () => {
             fs.writeFile(testDb, rawData, 'utf8', () => {
               d.loadDatabase((err) => {
                 const doc1 = _.find(d.getAllData(), (doc) => doc.z === '1');
-                var doc2 = _.find(d.getAllData(), (doc) => {
+                const doc2 = _.find(d.getAllData(), (doc) => {
                   return doc.z === '2';
                 });
-                var doc3 = _.find(d.getAllData(), (doc) => doc.z === '3');
+                const doc3 = _.find(d.getAllData(), (doc) => doc.z === '3');
                 assert.isNull(err);
                 d.getAllData().length.should.equal(3);
 
@@ -2517,10 +2532,10 @@ describe('Database', () => {
 
         d.insert({ a: 1, b: 'hello' }, (err, _doc1) => {
           d.insert({ a: 2, b: 'si' }, (err, _doc2) => {
-            d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, nr) => {
+            d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, [nr]) => {
               const data = d.getAllData();
-              let doc1 = _.find(data, (doc) => doc._id === _doc1._id);
-              let doc2 = _.find(data, (doc) => doc._id === _doc2._id);
+              const doc1 = _.find(data, (doc) => doc._id === _doc1._id);
+              const doc2 = _.find(data, (doc) => doc._id === _doc2._id);
               assert.isNull(err);
               nr.should.equal(1);
 
@@ -2528,12 +2543,12 @@ describe('Database', () => {
               assert.deepEqual(doc1, { a: 456, b: 'no', _id: _doc1._id });
               assert.deepEqual(doc2, { a: 2, b: 'si', _id: _doc2._id });
 
-              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, nr) => {
+              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, [nr]) => {
                 const data = d.getAllData();
-                var doc1 = _.find(data, (doc) => {
+                const doc1 = _.find(data, (doc) => {
                   return doc._id === _doc1._id;
                 });
-                var doc2 = _.find(data, (doc) => doc._id === _doc2._id);
+                const doc2 = _.find(data, (doc) => doc._id === _doc2._id);
                 assert.isNull(err);
                 nr.should.equal(2);
 
@@ -2555,7 +2570,7 @@ describe('Database', () => {
         d.insert({ a: 1, b: 'hello' }, (err, doc1) => {
           d.insert({ a: 2, b: 'si' }, (err, doc2) => {
             // Simple update
-            d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, nr) => {
+            d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, (err, [nr]) => {
               assert.isNull(err);
               nr.should.equal(1);
 
@@ -2577,7 +2592,7 @@ describe('Database', () => {
               d.indexes.b.getMatching('si')[0].should.equal(d.indexes._id.getMatching(doc2._id)[0]);
 
               // Multi update
-              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, nr) => {
+              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, (err, [nr]) => {
                 assert.isNull(err);
                 nr.should.equal(2);
 
@@ -2617,13 +2632,13 @@ describe('Database', () => {
               // Will conflict with doc3
               d.update({ a: 2 }, { $inc: { a: 10, c: 1000 }, $set: { b: 30 } }, {}, (err) => {
                 const data = d.getAllData();
-                var doc1 = _.find(data, (doc) => {
+                const doc1 = _.find(data, (doc) => {
                   return doc._id === _doc1._id;
                 });
-                var doc2 = _.find(data, (doc) => {
+                const doc2 = _.find(data, (doc) => {
                   return doc._id === _doc2._id;
                 });
-                var doc3 = _.find(data, (doc) => doc._id === _doc3._id);
+                const doc3 = _.find(data, (doc) => doc._id === _doc3._id);
                 err.errorType.should.equal('uniqueViolated');
 
                 // Data left unchanged
@@ -2670,13 +2685,13 @@ describe('Database', () => {
                 { multi: true },
                 (err) => {
                   const data = d.getAllData();
-                  var doc1 = _.find(data, (doc) => {
+                  const doc1 = _.find(data, (doc) => {
                     return doc._id === _doc1._id;
                   });
-                  var doc2 = _.find(data, (doc) => {
+                  const doc2 = _.find(data, (doc) => {
                     return doc._id === _doc2._id;
                   });
-                  var doc3 = _.find(data, (doc) => doc._id === _doc3._id);
+                  const doc3 = _.find(data, (doc) => doc._id === _doc3._id);
                   err.errorType.should.equal('uniqueViolated');
 
                   // Data left unchanged
@@ -2719,10 +2734,10 @@ describe('Database', () => {
             d.insert({ a: 3, b: 'coin' }, (err, _doc3) => {
               d.remove({ a: 1 }, {}, (err, nr) => {
                 const data = d.getAllData();
-                var doc2 = _.find(data, (doc) => {
+                const doc2 = _.find(data, (doc) => {
                   return doc._id === _doc2._id;
                 });
-                var doc3 = _.find(data, (doc) => doc._id === _doc3._id);
+                const doc3 = _.find(data, (doc) => doc._id === _doc3._id);
                 assert.isNull(err);
                 nr.should.equal(1);
 
@@ -2731,7 +2746,7 @@ describe('Database', () => {
                 assert.deepEqual(doc3, { a: 3, b: 'coin', _id: _doc3._id });
 
                 d.remove({ a: { $in: [2, 3] } }, { multi: true }, (err, nr) => {
-                  let data = d.getAllData();
+                  const data = d.getAllData();
                   assert.isNull(err);
                   nr.should.equal(2);
                   data.length.should.equal(0);
@@ -2799,7 +2814,7 @@ describe('Database', () => {
         if (fs.existsSync(persDb)) {
           fs.writeFileSync(persDb, '', 'utf8');
         }
-        db = new Datastore({ filename: persDb, autoload: true });
+        db = new DataStore({ filename: persDb, autoload: true });
 
         Object.keys(db.indexes).length.should.equal(1);
         Object.keys(db.indexes)[0].should.equal('_id');
@@ -2818,7 +2833,7 @@ describe('Database', () => {
               db.indexes.planet.fieldName.should.equal('planet');
 
               // After a reload the indexes are recreated
-              db = new Datastore({ filename: persDb });
+              db = new DataStore({ filename: persDb });
               db.loadDatabase((err) => {
                 assert.isNull(err);
                 Object.keys(db.indexes).length.should.equal(2);
@@ -2829,7 +2844,7 @@ describe('Database', () => {
                 db.indexes.planet.fieldName.should.equal('planet');
 
                 // After another reload the indexes are still there (i.e. they are preserved during autocompaction)
-                db = new Datastore({ filename: persDb });
+                db = new DataStore({ filename: persDb });
                 db.loadDatabase((err) => {
                   assert.isNull(err);
                   Object.keys(db.indexes).length.should.equal(2);
@@ -2854,7 +2869,7 @@ describe('Database', () => {
         if (fs.existsSync(persDb)) {
           fs.writeFileSync(persDb, '', 'utf8');
         }
-        db = new Datastore({ filename: persDb, autoload: true });
+        db = new DataStore({ filename: persDb, autoload: true });
 
         Object.keys(db.indexes).length.should.equal(1);
         Object.keys(db.indexes)[0].should.equal('_id');
@@ -2877,7 +2892,7 @@ describe('Database', () => {
                 assert.isNull(err);
 
                 // After a reload the indexes are recreated
-                db = new Datastore({ filename: persDb });
+                db = new DataStore({ filename: persDb });
                 db.loadDatabase((err) => {
                   assert.isNull(err);
                   Object.keys(db.indexes).length.should.equal(2);
@@ -2903,7 +2918,7 @@ describe('Database', () => {
                     db.indexes.bloup.sparse.should.equal(true);
 
                     // After another reload the indexes are still there (i.e. they are preserved during autocompaction)
-                    db = new Datastore({ filename: persDb });
+                    db = new DataStore({ filename: persDb });
                     db.loadDatabase(function (err) {
                       assert.isNull(err);
                       Object.keys(db.indexes).length.should.equal(3);
@@ -2935,7 +2950,7 @@ describe('Database', () => {
         if (fs.existsSync(persDb)) {
           fs.writeFileSync(persDb, '', 'utf8');
         }
-        db = new Datastore({ filename: persDb, autoload: true });
+        db = new DataStore({ filename: persDb, autoload: true });
 
         Object.keys(db.indexes).length.should.equal(1);
         Object.keys(db.indexes)[0].should.equal('_id');
@@ -2958,7 +2973,7 @@ describe('Database', () => {
                 db.indexes.planet.fieldName.should.equal('planet');
 
                 // After a reload the indexes are recreated
-                db = new Datastore({ filename: persDb });
+                db = new DataStore({ filename: persDb });
                 db.loadDatabase((err) => {
                   assert.isNull(err);
                   Object.keys(db.indexes).length.should.equal(3);
@@ -2978,7 +2993,7 @@ describe('Database', () => {
                     db.indexes._id.getAll().length.should.equal(2);
 
                     // After a reload indexes are preserved
-                    db = new Datastore({ filename: persDb });
+                    db = new DataStore({ filename: persDb });
                     db.loadDatabase(function (err) {
                       assert.isNull(err);
                       Object.keys(db.indexes).length.should.equal(2);
@@ -2987,7 +3002,7 @@ describe('Database', () => {
                       db.indexes._id.getAll().length.should.equal(2);
 
                       // After another reload the indexes are still there (i.e. they are preserved during autocompaction)
-                      db = new Datastore({ filename: persDb });
+                      db = new DataStore({ filename: persDb });
                       db.loadDatabase(function (err) {
                         assert.isNull(err);
                         Object.keys(db.indexes).length.should.equal(2);

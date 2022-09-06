@@ -1,7 +1,7 @@
 const test = require('tape'); // eslint-disable-line import/no-extraneous-dependencies
 const errio = require('errio');
 
-const rpc = require('../../lib/rpc');
+const { doRpc } = require('../../lib/rpc');
 
 test('without callback', (t) => {
   const args = [{}];
@@ -12,20 +12,18 @@ test('without callback', (t) => {
     },
   };
 
-  rpc(socket, 'file', 'method', args);
+  doRpc(socket, 'file', 'method', args);
 });
 
 test('with callback', (t) => {
   t.test('with no error', (st) => {
     const socketReplyArg1 = 'arg1';
-    const socketReplyArg2 = 'arg2';
 
     const args = [
       {},
       (err, arg1, arg2) => {
         st.notOk(err);
         st.deepEqual(arg1, socketReplyArg1);
-        st.deepEqual(arg2, socketReplyArg2);
         st.end();
       },
     ];
@@ -33,11 +31,11 @@ test('with callback', (t) => {
     const socket = {
       send(filename, method, dataOnlyArgs, callback) {
         st.deepEqual(dataOnlyArgs, args.slice(0, 1));
-        callback(null, socketReplyArg1, socketReplyArg2);
+        callback(null, socketReplyArg1);
       },
     };
 
-    rpc(socket, 'file', 'method', args);
+    doRpc(socket, 'file', 'method', args);
   });
 
   t.test('with error', (st) => {
@@ -58,6 +56,6 @@ test('with callback', (t) => {
       },
     };
 
-    rpc(socket, 'file', 'method', args);
+    doRpc(socket, 'file', 'method', args);
   });
 });

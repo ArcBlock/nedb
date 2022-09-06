@@ -21,9 +21,9 @@
     "url": "git@github.com:ArcBlock/nedb.git"
   },
   "devDependencies": {
-    "chai": "1.0.x",
-    "mocha": "1.4.x",
-    "underscore": "~1.13.3"
+    "chai": "~1.0.4",
+    "mocha": "~1.4.3",
+    "underscore": "~1.13.4"
   },
   "scripts": {
     "precommit": "npm run test",
