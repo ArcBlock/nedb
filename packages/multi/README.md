@@ -2,7 +2,7 @@
 
 `Nedb` (https://github.com/louischatriot/nedb) does not support concurrent access from multiple processes. One module which tries to solve this problem is `nedb-party` (https://github.com/allain/nedb-party). However, it does not support methods that return cursors. It also relies on each process starting a http server on the same port and whichever manages to start listening becomes the master and the others connect to it. This however does not work if you're using the `cluster` module (or `PM2`) as in that case the port is shared between the child processes and they are all able to become masters. I submitted a patch request, which was accepted, that instead used directory-based locking. This was enough to make it work but managing locks can be tricky.
 
-I decided to try a similar, but lock-free approach, using the `axon` framework (https://github.com/tj/axon). There's still only one master process that the others connect to, but there are no locks. Also, both callback- and cursor-based methods are supported. The `setAutoCompactionInterval`, `stopAutoCompaction` and `compactDatafile` methods of the `DataStore#persistence` object are also supported, except for the `compaction.done` event fired after calling `compactDatafile`.
+I decided to try a similar, but lock-free approach, using the `axon` framework (https://github.com/tj/axon). There's still only one master process that the others connect to, but there are no locks. Also, both callback, promise and cursor-based methods are supported. The `setAutoCompactionInterval`, `stopAutoCompaction` and `compactDatafile` methods of the `DataStore#persistence` object are also supported, except for the `compaction.done` event fired after calling `compactDatafile`.
 
 ## Installation
 
@@ -16,17 +16,102 @@ You can pass the port number on which the server will listen by giving it as the
 
 In your other processes create the datastore by passing the port you set in the previous step. All options fields which can be serialized to JSON, are supported, except for `autoload`.
 
+### Javascript
+
 ```javascript
-const DataStore = require('@nedb/multi')(<port>);
+const { createDataStore } = require('@nedb/multi');
+
+const DataStore = createDataStore(+process.env.NEDB_MULTI_PORT);
 
 const db = new DataStore({ filename: 'test.db' });
 
-db.loadDatabase(function (err) {
-  // ...
+// This is required
+db.loadDatabase(async (err) => {
+  // CRUD
+  const newDoc = await db.insert({
+    appId: '1',
+    appName: 'test',
+  });
+  console.log(newDoc);
+
+  const newDoc2 = await db.insert({
+    appId: '2',
+    appName: 'test2',
+  });
+  console.log(newDoc2);
+
+  const docs = await db.find();
+  console.log(docs);
+
+  // promise style
+  const oldDoc = await db.findOne({ appId: '2' });
+  console.log(oldDoc);
+
+  // cursor styled
+  const result = await db.cursor().query({ appId: '1' }).limit(1).exec();
+  console.log(result);
 });
 ```
 
 _Note: It does not matter if you start the server before or after creating the datastore._
+
+### Typescript
+
+Example:
+
+```typescript
+import { createDataStore } from '@nedb/multi';
+
+const DataStore = createDataStore(+process.env.NEDB_MULTI_PORT);
+
+type Market = {
+  appId: string;
+  appName: string;
+  appPk?: string;
+  appLink?: string;
+  viewCount?: number;
+};
+
+const db = new DataStore<Market>({ timestampData: true });
+
+(async () => {
+  await db.loadDatabase();
+
+  const newDoc = await db.insert({
+    appId: '1',
+    appName: 'test',
+  });
+  console.log(newDoc);
+
+  const newDoc2 = await db.insert({
+    appId: '2',
+    appName: 'test2',
+  });
+  console.log(newDoc2);
+
+  const docs = await db.find();
+  console.log(docs);
+
+  // promise style
+  const oldDoc = await db.findOne({ appId: '2' });
+  console.log(oldDoc);
+
+  // cursor styled
+  const result = await db.cursor().query({ appId: '1' }).limit(1).exec();
+  console.log(result);
+
+  db.find({ appId: '1' }, (err, docs) => {
+    console.log(docs?.map((x) => x._id));
+  });
+
+  db.count({ appId: '1' }).then((x) => console.log(x));
+
+  const rowsRemoved = await db.remove({ appId: '1' });
+  console.log(rowsRemoved);
+
+  process.exit(0);
+})();
+```
 
 ## Example
 

@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/filename-case */
+/* eslint-disable prefer-rest-params */
 /* eslint-disable @typescript-eslint/lines-between-class-members */
 
 import {
@@ -15,79 +16,101 @@ import {
   UpdateResult,
 } from '@nedb/core';
 
-import { createMethod } from './method';
-import { METHODS_DESCRIPTIONS } from './constants';
-import { PersistenceProxy } from './persistenceProxy';
+import { doRpc } from './rpc';
 import { Cursor } from './cursor';
+import { PersistenceProxy } from './persistenceProxy';
 
 export function createDataStore(socket: any) {
-  class DataStore<T> implements DataStore<T> {
-    options: DataStoreOptions;
-    persistence: any;
+  class DataStore<T> {
+    readonly options: DataStoreOptions;
+    readonly persistence: any;
 
     constructor(options: any) {
       this.options = options;
       this.persistence = new PersistenceProxy(socket, options);
     }
-  }
 
-  for (const { name, supportsCursor } of METHODS_DESCRIPTIONS) {
-    // @ts-ignore
-    DataStore.prototype[name] = createMethod<any>(socket, name, supportsCursor);
-  }
+    public loadDatabase(): PromiseLike<void>;
+    public loadDatabase(cb: CallbackOptionalError): void;
+    public loadDatabase() {
+      return doRpc<void>(socket, this.options, 'loadDatabase', Array.prototype.slice.call(arguments));
+    }
 
-  return DataStore;
-}
+    public closeDatabase(): PromiseLike<void>;
+    public closeDatabase(cb: CallbackOptionalError): void;
+    public closeDatabase() {
+      return doRpc<void>(socket, this.options, 'closeDatabase', Array.prototype.slice.call(arguments));
+    }
 
-export namespace createDataStore {
-  export interface DataStore<T> {
-    loadDatabase(): PromiseLike<void>;
-    loadDatabase(cb: CallbackOptionalError): void;
+    public ensureIndex(options: IndexOptions, cb?: CallbackOptionalError) {
+      return doRpc<void>(socket, this.options, 'ensureIndex', Array.prototype.slice.call(arguments));
+    }
 
-    closeDatabase(): PromiseLike<void>;
-    closeDatabase(cb: CallbackOptionalError): void;
+    public removeIndex(fieldName: string, cb?: CallbackOptionalError) {
+      return doRpc<void>(socket, this.options, 'removeIndex', Array.prototype.slice.call(arguments));
+    }
 
-    ensureIndex(options: IndexOptions, cb?: CallbackOptionalError): void;
-    removeIndex(fieldName: string, cb?: CallbackOptionalError): void;
+    public insert(doc: T): PromiseLike<Row<T>>;
+    public insert(doc: T[]): PromiseLike<Row<T>[]>;
+    public insert(doc: T, cb: CallbackWithResult<Row<T>>): void;
+    public insert(doc: T[], cb: CallbackWithResult<Row<T>[]>): void;
+    public insert(): any {
+      return doRpc<void>(socket, this.options, 'insert', Array.prototype.slice.call(arguments));
+    }
 
-    getCandidates(query: FilterQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
-    getCandidates(query: FilterQuery<T>, dontExpireStaleDocs: boolean, callback: CallbackWithResult<Row<T>[]>): void;
+    public cursor(query?: FilterQuery<T>): Cursor<T> {
+      return new Cursor<T>(socket, this.options, Array.prototype.slice.call(arguments));
+    }
 
-    insert(doc: T): PromiseLike<Row<T>>;
-    insert(doc: T[]): PromiseLike<Row<T>[]>;
-    insert(doc: T, cb: CallbackWithResult<Row<T>>): void;
-    insert(doc: T[], cb: CallbackWithResult<Row<T>[]>): void;
+    public count(query?: FilterQuery<T>): PromiseLike<number>;
+    public count(query: FilterQuery<T>, callback: CallbackWithResult<number>): void;
+    public count(callback: CallbackWithResult<number>): void;
+    public count(): any {
+      return doRpc<void>(socket, this.options, 'count', Array.prototype.slice.call(arguments));
+    }
 
-    cursor(query?: FilterQuery<T>): Cursor<T>;
+    public find(query?: FilterQuery<T>): PromiseLike<Row<T>[]>;
+    public find(query: FilterQuery<T>, projection: ProjectionQuery<T>): PromiseLike<Row<T>[]>;
+    public find(callback: CallbackWithResult<Row<T>[]>): void;
+    public find(query: FilterQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
+    public find(query: FilterQuery<T>, projection: ProjectionQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
+    public find(): any {
+      return doRpc<void>(socket, this.options, 'find', Array.prototype.slice.call(arguments));
+    }
 
-    count(query?: FilterQuery<T>): PromiseLike<number>;
-    count(query: FilterQuery<T>, callback: CallbackWithResult<number>): void;
-    count(callback: CallbackWithResult<number>): void;
+    public findOne(query?: FilterQuery<T>): PromiseLike<Row<T>>;
+    public findOne(query: FilterQuery<T>, projection?: ProjectionQuery<T>): PromiseLike<Row<T>>;
+    public findOne(query: FilterQuery<T>, callback?: CallbackWithResult<Row<T>>): void;
+    public findOne(query: FilterQuery<T>, projection: ProjectionQuery<T>, callback: CallbackWithResult<Row<T>>): void;
+    public findOne(): any {
+      return doRpc<void>(socket, this.options, 'findOne', Array.prototype.slice.call(arguments));
+    }
 
-    find(query?: FilterQuery<T>): PromiseLike<Row<T>[]>;
-    find(query: FilterQuery<T>, projection: ProjectionQuery<T>): PromiseLike<Row<T>[]>;
-    find(callback: CallbackWithResult<Row<T>[]>): void;
-    find(query: FilterQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
-    find(query: FilterQuery<T>, projection: ProjectionQuery<T>, callback: CallbackWithResult<Row<T>[]>): void;
-
-    findOne(query?: FilterQuery<T>): PromiseLike<Row<T>>;
-    findOne(query: FilterQuery<T>, projection?: ProjectionQuery<T>): PromiseLike<Row<T>>;
-    findOne(query: FilterQuery<T>, callback?: CallbackWithResult<Row<T>>): void;
-    findOne(query: FilterQuery<T>, projection: ProjectionQuery<T>, callback: CallbackWithResult<Row<T>>): void;
-
-    update(query: FilterQuery<T>, updateQuery: UpdateQuery<T>): PromiseLike<UpdateResult<T>>;
-    update(query: FilterQuery<T>, updateQuery: UpdateQuery<T>, cb: CallbackWithResult<any>): void;
-    update(query: FilterQuery<T>, updateQuery: UpdateQuery<T>, options: UpdateOptions): PromiseLike<UpdateResult<T>>;
-    update(
+    public update(query: FilterQuery<T>, updateQuery: UpdateQuery<T>): PromiseLike<UpdateResult<T>>;
+    public update(query: FilterQuery<T>, updateQuery: UpdateQuery<T>, cb: CallbackWithResult<any>): void;
+    public update(
+      query: FilterQuery<T>,
+      updateQuery: UpdateQuery<T>,
+      options: UpdateOptions
+    ): PromiseLike<UpdateResult<T>>;
+    public update(
       query: FilterQuery<T>,
       updateQuery: UpdateQuery<T>,
       options: UpdateOptions,
       cb: CallbackWithResult<any>
     ): void;
+    public update(): any {
+      return doRpc<void>(socket, this.options, 'update', Array.prototype.slice.call(arguments));
+    }
 
-    remove(query: FilterQuery<T>): PromiseLike<number>;
-    remove(query: FilterQuery<T>, options: RemoveOptions): PromiseLike<number>;
-    remove(query: FilterQuery<T>, cb: CallbackWithResult<number>): void;
-    remove(query: FilterQuery<T>, options: RemoveOptions, cb: CallbackWithResult<number>): void;
+    public remove(query: FilterQuery<T>): PromiseLike<number>;
+    public remove(query: FilterQuery<T>, options: RemoveOptions): PromiseLike<number>;
+    public remove(query: FilterQuery<T>, cb: CallbackWithResult<number>): void;
+    public remove(query: FilterQuery<T>, options: RemoveOptions, cb: CallbackWithResult<number>): void;
+    public remove(): any {
+      return doRpc<void>(socket, this.options, 'remove', Array.prototype.slice.call(arguments));
+    }
   }
+
+  return DataStore;
 }

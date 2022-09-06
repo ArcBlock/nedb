@@ -1,10 +1,11 @@
 {
   "name": "@nedb/multi",
   "author": "Vladimir Angelov, wangshijun",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "files": [
     "lib",
     "example",
-    "index.js",
     "server.js"
   ],
   "publishConfig": {

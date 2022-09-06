@@ -563,7 +563,7 @@ export class DataStore<T> extends EventEmitter {
   public insert(doc: T[]): PromiseLike<Row<T>[]>;
   public insert(doc: T, cb: CallbackWithResult<Row<T>>): void;
   public insert(doc: T[], cb: CallbackWithResult<Row<T>[]>): void;
-  public insert(doc: any, cb?: any): any {
+  public insert(): any {
     debug('insert', arguments);
     return this._promiseAsCallback<T>(this, this._insert, Array.prototype.slice.call(arguments));
   }
