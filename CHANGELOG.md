@@ -1,3 +1,7 @@
+## 2.0.1 (September 06, 2022)
+
+- chore: add default type for generic types
+
 ## 2.0.0 (September 06, 2022)
 
 - chore: update ci for lint and test
