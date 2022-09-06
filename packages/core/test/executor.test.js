@@ -123,10 +123,6 @@ function testExecutorWorksWithoutCallback(d, done) {
   });
 }
 
-if (process.env.CI) {
-  return;
-}
-
 describe('Executor', () => {
   describe('With persistent database', () => {
     let d;
@@ -169,17 +165,19 @@ describe('Executor', () => {
       testRightOrder(d, done);
     });
 
-    it('Does not starve event loop and raise warning when more than 1000 callbacks are in queue', (done) => {
-      testEventLoopStarvation(d, done);
-    }).timeout(20000);
+    if (!process.env.CI) {
+      it('Does not starve event loop and raise warning when more than 1000 callbacks are in queue', (done) => {
+        testEventLoopStarvation(d, done);
+      }).timeout(20000);
 
-    it('Works in the right order even with no supplied callback', (done) => {
-      testExecutorWorksWithoutCallback(d, done);
-    });
+      it('Works in the right order even with no supplied callback', (done) => {
+        testExecutorWorksWithoutCallback(d, done);
+      });
 
-    it('A throw in a callback doesnt prevent execution of next operations', (done) => {
-      testThrowInCallback(d, done);
-    });
+      it('A throw in a callback doesnt prevent execution of next operations', (done) => {
+        testThrowInCallback(d, done);
+      });
+    }
   }); // ==== End of 'With persistent database' ====
 
   describe.skip('With non persistent database', () => {
