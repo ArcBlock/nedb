@@ -55,6 +55,6 @@ export class Cursor<T> {
   }
 
   public exec(callback?: CallbackWithResult<T[]>) {
-    return doRpc<T[]>(this.socket, this.options, EXECUTE_CURSOR_PRIVATE, [this, callback]);
+    return doRpc<T[]>(this.socket, this.options, EXECUTE_CURSOR_PRIVATE, [this, callback].filter(Boolean));
   }
 }

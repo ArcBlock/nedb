@@ -22,7 +22,7 @@ const replyCallback =
 export const createHandler =
   (map: Map<string, typeof DataStore>) =>
   (options: DataStoreOptions, method: string, dataOnlyArgs: any[], reply: CallbackWithResult<any>) => {
-    const { filename } = options;
+    const { filename = 'memory' } = options;
     let db = map.get(filename);
 
     if (method === 'loadDatabase') {

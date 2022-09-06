@@ -16,3 +16,4 @@ exec-child.js
 coverage
 _test
 workspace
+.nyc_output
