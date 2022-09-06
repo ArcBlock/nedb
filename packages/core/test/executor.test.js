@@ -123,6 +123,10 @@ function testExecutorWorksWithoutCallback(d, done) {
   });
 }
 
+if (process.env.CI) {
+  return;
+}
+
 describe('Executor', () => {
   describe('With persistent database', () => {
     let d;
