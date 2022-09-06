@@ -11,6 +11,7 @@ import {
   ProjectionQuery,
   RemoveOptions,
   Row,
+  AnyObject,
   UpdateOptions,
   UpdateQuery,
   UpdateResult,
@@ -21,7 +22,7 @@ import { Cursor } from './cursor';
 import { PersistenceProxy } from './persistenceProxy';
 
 export function createDataStore(socket: any) {
-  class DataStore<T> {
+  class DataStore<T = AnyObject> {
     readonly options: DataStoreOptions;
     readonly persistence: any;
 

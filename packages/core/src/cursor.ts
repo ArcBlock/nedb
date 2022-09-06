@@ -4,7 +4,7 @@
 
 import asCallback from 'standard-as-callback';
 
-import { CallbackWithResult, FilterQuery, ProjectionQuery, SortQuery, Row } from './types';
+import { CallbackWithResult, FilterQuery, ProjectionQuery, SortQuery, Row, AnyObject } from './types';
 
 // eslint-disable-next-line global-require
 const debug = require('debug')(`${require('../package.json').name}:cursor`);
@@ -14,7 +14,7 @@ const debug = require('debug')(`${require('../package.json').name}:cursor`);
  */
 const model = require('./model');
 
-export class Cursor<T> {
+export class Cursor<T = AnyObject> {
   private db: any;
   private execFn: Function;
 

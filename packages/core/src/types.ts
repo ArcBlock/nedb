@@ -30,6 +30,10 @@ export type IndexOptions = {
   expireAfterSeconds?: number;
 };
 
+export type AnyObject = {
+  [key: string]: any;
+};
+
 export type Row<T> = {
   _id?: string;
   createdAt?: string;
@@ -92,10 +96,11 @@ export type RootQuerySelector<T> = {
   $not?: Array<FilterQuery<T>>;
   $where?: Function;
 
-  $limit?: number;
-  $skip?: number;
-  $sort?: SortQuery<T>;
-  $projection?: ProjectionQuery<T>;
+  // cursor ops
+  // $limit?: number;
+  // $skip?: number;
+  // $sort?: SortQuery<T>;
+  // $projection?: ProjectionQuery<T>;
 
   // we could not find a proper TypeScript generic to support nested queries e.g. 'user.friends.name'
   // this will mark all unrecognized properties as any (including nested queries)

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/lines-between-class-members */
-import { SortQuery, ProjectionQuery, CallbackWithResult, FilterQuery } from '@nedb/core';
+import { SortQuery, ProjectionQuery, CallbackWithResult, FilterQuery, AnyObject } from '@nedb/core';
 import { doRpc } from './rpc';
 import { EXECUTE_CURSOR_PRIVATE } from './constants';
 
-export class Cursor<T> {
+export class Cursor<T = AnyObject> {
   private _skip: number;
   private _limit: number;
   private _query: FilterQuery<T>;

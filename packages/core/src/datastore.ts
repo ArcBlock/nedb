@@ -47,6 +47,7 @@ import {
   RemoveOptions,
   NativeError,
   Row,
+  AnyObject,
 } from './types';
 
 /**
@@ -65,7 +66,7 @@ import {
  * Event Emitter - Events
  * * compaction.done - Fired whenever a compaction operation was finished
  */
-export class DataStore<T> extends EventEmitter {
+export class DataStore<T = AnyObject> extends EventEmitter {
   public readonly inMemoryOnly: boolean;
   public readonly autoload: boolean;
   public readonly timestampData: boolean;
