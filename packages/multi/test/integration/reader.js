@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-const { createDataStore } = require('@nedb/multi');
+const { createDataStore } = require('../../lib/index');
 
 const DataStore = createDataStore(Number(process.env.NEDB_MULTI_PORT));
 

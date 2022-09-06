@@ -1,6 +1,6 @@
 import { CallbackWithResult } from '@nedb/core';
 
-export function endsWithCallback(args: any[]): boolean {
+export function endsWithCallback(args?: any[]): boolean {
   return args && args.length > 0 && typeof args[args.length - 1] === 'function';
 }
 

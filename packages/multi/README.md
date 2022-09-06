@@ -4,6 +4,8 @@
 
 I decided to try a similar, but lock-free approach, using the `axon` framework (https://github.com/tj/axon). There's still only one master process that the others connect to, but there are no locks. Also, both callback, promise and cursor-based methods are supported. The `setAutoCompactionInterval`, `stopAutoCompaction` and `compactDatafile` methods of the `DataStore#persistence` object are also supported, except for the `compaction.done` event fired after calling `compactDatafile`.
 
+> This is a fork maintained by [ArcBlock](https://www.arcblock.io) of the original version by Vladimir. Which added promise and typescript support.
+
 ## Installation
 
 `npm install --save @nedb/multi`
