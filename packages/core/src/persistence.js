@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable func-names */
 /* eslint-disable consistent-return */
@@ -101,6 +102,7 @@ Persistence.prototype.persistCachedDatabase = function (reopen, cb) {
   const stream = fs.createWriteStream(tempFile);
 
   let fd = null;
+  // eslint-disable-next-line no-return-assign
   stream.on('open', (_fd) => (fd = _fd));
 
   this.db.forEach((doc) => stream.write(`${this.afterSerialization(doc)}\n`));
@@ -166,11 +168,14 @@ Persistence.prototype.setAutoCompactionInterval = function (
 ) {
   this.stopAutoCompaction();
 
+  const realInterval = Math.max(interval || 0, 5000);
+
   let currentCompactionTimer;
   const doCompaction = () => {
     currentCompactionTimer = this.autocompactionIntervalId;
     if (this.writtenCount >= minimumWritten || this.writtenBytes > minimumBytes) {
       this.compactDatafile(() => {
+        // eslint-disable-next-line no-multi-assign
         this.writtenCount = this.writtenBytes = 0;
         if (currentCompactionTimer == this.autocompactionIntervalId)
           this.autocompactionIntervalId = setTimeout(doCompaction, realInterval);
@@ -178,7 +183,6 @@ Persistence.prototype.setAutoCompactionInterval = function (
     }
   };
 
-  const realInterval = Math.max(interval || 0, 5000);
   this.autocompactionIntervalId = setTimeout(doCompaction, realInterval);
 };
 
@@ -251,6 +255,7 @@ Persistence.prototype.readFileAndParse = function (cb) {
       );
     }
 
+    // eslint-disable-next-line guard-for-in
     for (const k in dataById) {
       tdata.push(dataById[k]);
     }
@@ -318,6 +323,7 @@ Persistence.prototype.treatRawData = function (rawData) {
     );
   }
 
+  // eslint-disable-next-line guard-for-in
   for (const k in dataById) {
     tdata.push(dataById[k]);
   }
@@ -387,6 +393,7 @@ Persistence.prototype.loadDatabase = function (cb) {
                 }
 
                 // Recreate all indexes in the datafile
+                // eslint-disable-next-line guard-for-in
                 for (const key in treatedData.indexes) {
                   this.db.indexes[key] = new Index(treatedData.indexes[key]);
                 }

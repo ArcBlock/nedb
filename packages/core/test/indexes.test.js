@@ -1,9 +1,11 @@
-const Index = require('../lib/indexes');
-const customUtils = require('../lib/customUtils');
+// @ts-nocheck
 const should = require('chai').should();
 const { assert } = require('chai');
 const _ = require('underscore');
 const [AsyncWaterfall, AsyncApply] = [require('async/waterfall'), require('async/apply')];
+
+const Index = require('../lib/indexes');
+const customUtils = require('../lib/customUtils');
 const model = require('../lib/model');
 
 describe('Indexes', () => {

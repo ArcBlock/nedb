@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-implied-eval */
+/* eslint-disable no-restricted-globals */
+// @ts-nocheck
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable guard-for-in */
 /* eslint-disable quotes */
 /* eslint-disable no-underscore-dangle */
@@ -381,6 +385,7 @@ lastStepModifierFunctions.$unset = function (obj, field, value) {
 lastStepModifierFunctions.$push = function (obj, field, value) {
   const doPush = (o) => {
     // Create the array if it doesn't exist
+    // eslint-disable-next-line no-prototype-builtins
     if (!o.hasOwnProperty(field)) {
       o[field] = [];
     }
@@ -445,6 +450,7 @@ lastStepModifierFunctions.$addToSet = function (obj, field, value) {
   let addToSet = true;
 
   // Create the array if it doesn't exist
+  // eslint-disable-next-line no-prototype-builtins
   if (!obj.hasOwnProperty(field)) {
     obj[field] = [];
   }
@@ -683,6 +689,7 @@ function getDotFn(field) {
     }
     fnCode += 'return obj';
 
+    // eslint-disable-next-line no-multi-assign
     extractionCache[field] = ecfn = new Function('obj', fnCode);
   }
   return ecfn;
@@ -748,6 +755,7 @@ function setionDotValue(obj, field, create) {
     }
     fnCode += 'return obj;';
 
+    // eslint-disable-next-line no-multi-assign
     setionCache[field] = ecfn = { fn: new Function('obj', 'create', fnCode), last };
   }
 
@@ -1116,7 +1124,6 @@ function matchArray(obj, queryKey, queryValue, objValue) {
 
   // Check if we are using an array-specific comparison function
   if (queryValue !== null && typeof queryValue === 'object') {
-    keys = Object.keys(queryValue);
     for (const key in queryValue) {
       if (arrayComparisonFunctions[key]) {
         return matchQueryPart(obj, queryKey, queryValue, true);

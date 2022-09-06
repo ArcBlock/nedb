@@ -26,6 +26,7 @@ function Executor() {
     if (typeof lastArg === 'function') {
       // Callback was supplied
       newArguments[newArguments.length - 1] = function () {
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
         setImmediate(cb);
         try {
           lastArg.apply(null, arguments);

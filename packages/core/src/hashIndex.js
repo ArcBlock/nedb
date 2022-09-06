@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/filename-case */
 /* eslint-disable func-names */
 /* eslint-disable no-underscore-dangle */
 const util = require('util');
@@ -153,6 +154,7 @@ HashIndex.prototype.remove = function (doc) {
 HashIndex.prototype.update = function (oldDoc, newDoc) {
   const oldKey = this._extractKey(oldDoc);
   const newKey = this._extractKey(newDoc);
+  // eslint-disable-next-line eqeqeq
   if (oldKey == newKey) this.data.set(oldKey, newDoc);
   else {
     this.remove(oldDoc);

@@ -4,7 +4,6 @@ const { expect } = require('chai');
 const _ = require('underscore');
 const util = require('util');
 const fs = require('fs');
-const get = require('lodash/get');
 
 const model = require('../lib/model');
 const { DataStore } = require('../lib/datastore');

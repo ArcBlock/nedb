@@ -18,6 +18,8 @@ module.exports = {
     'global-require': 'off',
     'no-dupe-keys': 'off',
     'no-new': 'off',
+    'no-continue': 'off',
+    eqeqeq: 'off',
     'consistent-return': 'off',
     'no-param-reassign': 'off',
   },

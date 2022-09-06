@@ -51,22 +51,22 @@ describe('Database', () => {
 
   it('Can open and close cleanly', (done) => {
     const closeDb = 'workspace/close.db';
-    var db = new DataStore({ filename: closeDb, autoload: true });
+    let db = new DataStore({ filename: closeDb, autoload: true });
     db.filename.should.equal(closeDb);
     db.inMemoryOnly.should.equal(false);
     db.closeDatabase().then(() => done());
   });
 
   it('Constructor compatibility with v0.6-', () => {
-    var dbef = new DataStore('somefile');
+    let dbef = new DataStore('somefile');
     dbef.filename.should.equal('somefile');
     dbef.inMemoryOnly.should.equal(false);
 
-    var dbef = new DataStore('');
+    dbef = new DataStore('');
     assert.isNull(dbef.filename);
     dbef.inMemoryOnly.should.equal(true);
 
-    var dbef = new DataStore();
+    dbef = new DataStore();
     assert.isNull(dbef.filename);
     dbef.inMemoryOnly.should.equal(true);
   });
@@ -97,7 +97,7 @@ describe('Database', () => {
           _id: '2',
           a: 5,
           planet: 'Mars',
-        })}\n` + '{"$$indexCreated":{"fieldName":"a","unique":true}}';
+        })}\n` + '{"$$indexCreated":{"fieldName":"a","unique":true}}'; // eslint-disable-line
       const autoDb = 'workspace/auto.db';
       let db;
 
