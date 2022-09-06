@@ -20,7 +20,7 @@
     "test:unit": "nyc tape test/unit/**.js | tap-nyc",
     "start-server": "NEDB_MULTI_PORT=5151 node server.js",
     "test-server": "NEDB_MULTI_ITERATIONS=10 NEDB_MULTI_PORT=5151 node test/integration/test.js",
-    "test:integration": "rm test.data && start-server-and-test start-server tcp:5151 test-server",
+    "test:integration": "rm -f test.data && start-server-and-test start-server tcp:5151 test-server",
     "lint": "eslint src test",
     "lint:fix": "npm run lint -- --fix",
     "clean": "rm -fr lib",
