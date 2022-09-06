@@ -2,11 +2,10 @@
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
-- [Introduction](#introduction)
-- [Getting Started](#getting-started)
-- [Packages](#packages)
-- [Credits](#credits)
+- [Table of Contents](#Table-of-Contents)
+- [Introduction](#Introduction)
+- [Packages](#Packages)
+- [License](#License)
 
 ## Introduction
 
@@ -14,7 +13,7 @@
 [![docs](https://img.shields.io/badge/powered%20by-arcblock-green.svg)](https://docs.arcblock.io)
 [![Gitter](https://badges.gitter.im/ArcBlock/community.svg)](https://gitter.im/ArcBlock/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-> Last updated at 8/18/2022, 9:04:42 AM
+> Last updated at 9/6/2022, 8:06:25 AM
 
 This repo contains a [NEDB](https://github.com/louischatriot/nedb) fork used by ArcBlock products.
 
@@ -22,7 +21,7 @@ Along with the NEDB core, we have updated several related packages to improve pe
 
 - Most dependencies are upgraded to latest to get better security and performance
 - Use @nedb/multi to read and write to the same database in different node.js processes
-- Use @nedb/mongoose-driver [deprecated and not working anymore] as a drop-in replacement for mongoose + mongodb to make apps lightweight
+- Use @nedb/mongoose-driver as a drop-in replacement for mongoose + mongodb to make apps lightweight
 
 Limitations: if you want to use nedb in browser, please use the original version.
 
@@ -41,3 +40,4 @@ Checkout instructions [here](./docs/contribute.md) on how to contribute.
 
 - [NEDB Core](https://github.com/louischatriot/nedb)
 - [NEDB Multi](https://github.com/vangelov/nedb-multi)
+
