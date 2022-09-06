@@ -1,3 +1,9 @@
+## 2.0.0 (September 06, 2022)
+
+- chore: update ci for lint and test
+- feat: support promise and typescript for multi
+- feat: support promise and typescript for core
+
 ## 1.3.4 (August 18, 2022)
 
 - fix(multi): fix bug of closeDatabase()
