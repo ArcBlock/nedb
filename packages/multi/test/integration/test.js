@@ -4,8 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 
-if (process.env.TRAVIS) {
-  console.log('skip integration test in travis');
+if (process.env.CI) {
   // @ts-ignore
   return;
 }
