@@ -11,10 +11,6 @@
     "access": "public"
   },
   "scripts": {
-    "precommit": "npm run test",
-    "prepush": "npm run test",
-    "test": "mocha tests/*.test.js tests/**/*.test.js",
-    "test-cov": "nyc cover --report text --report html _mocha tests/*.test.js"
   },
   "repository": {
     "type": "git",
