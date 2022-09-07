@@ -5,6 +5,10 @@ import asCallback from 'standard-as-callback';
 import { endsWithCallback } from './utils';
 
 export function doRpc<T>(socket: any, options: any, method: string, args: any[]): PromiseLike<T> {
+  while (args.length && typeof args[args.length - 1] === 'undefined') {
+    args.pop();
+  }
+
   const dataOnlyArgs = args;
   let callback;
 
