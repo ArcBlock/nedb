@@ -51,7 +51,7 @@ export type UpdateOptions = {
   upsert?: boolean;
   returnUpdatedDocs?: boolean;
 };
-export type UpdateResult<T> = [number, T[], boolean];
+export type UpdateResult<T> = [number, Row<T>[], boolean];
 export type UpdateQuery<T> = {
   // https://www.npmjs.com/package/@nedb/core
   $set?: { [P in keyof T]?: any };
