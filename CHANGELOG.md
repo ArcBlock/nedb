@@ -1,3 +1,7 @@
+## 2.0.3 (September 08, 2022)
+
+- fix: crash caused by undefined param
+
 ## 2.0.2 (September 07, 2022)
 
 - chore: update readme
