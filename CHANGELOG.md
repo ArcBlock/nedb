@@ -1,3 +1,8 @@
+## 2.0.2 (September 07, 2022)
+
+- chore: update readme
+- fix: update result type
+
 ## 2.0.1 (September 06, 2022)
 
 - chore: add default type for generic types
