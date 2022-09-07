@@ -707,6 +707,13 @@ const s = new DataStore<TMarket>({ timestampData: true });
   const oldDoc = await s.findOne();
   console.log(oldDoc);
 
+  const [rowsAffected, updatedDocs, isUpsert] = await db.update(
+    { appId: '2' },
+    { $set: { appName: 'updated' } },
+    { returnUpdatedDocs: true, upsert: true, multi: true }
+  );
+  console.log({ rowsAffected, updatedDocs, isUpsert });
+
   const result = await s.cursor().query({ appId: '1' }).limit(1).exec();
   console.log(result);
 

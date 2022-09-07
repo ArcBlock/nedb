@@ -49,6 +49,13 @@ db.loadDatabase(async (err) => {
   const oldDoc = await db.findOne({ appId: '2' });
   console.log(oldDoc);
 
+  const [rowsAffected, updatedDocs, isUpsert] = await db.update(
+    { appId: '2' },
+    { $set: { appName: 'updated' } },
+    { returnUpdatedDocs: true, upsert: true, multi: true }
+  );
+  console.log({ rowsAffected, updatedDocs, isUpsert });
+
   // cursor styled
   const result = await db.cursor().query({ appId: '1' }).limit(1).exec();
   console.log(result);
@@ -97,6 +104,13 @@ const db = new DataStore<Market>({ timestampData: true });
   // promise style
   const oldDoc = await db.findOne({ appId: '2' });
   console.log(oldDoc);
+
+  const [rowsAffected, updatedDocs, isUpsert] = await db.update(
+    { appId: '2' },
+    { $set: { appName: 'updated' } },
+    { returnUpdatedDocs: true, upsert: true, multi: true }
+  );
+  console.log({ rowsAffected, updatedDocs, isUpsert });
 
   // cursor styled
   const result = await db.cursor().query({ appId: '1' }).limit(1).exec();
