@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 /* eslint-disable @typescript-eslint/lines-between-class-members */
 /* eslint-disable import/first */
 /* eslint-disable import/order */
@@ -202,60 +203,63 @@ export class DataStore<T = AnyObject> extends EventEmitter {
    * @param {Boolean} options.sparse
    * @param {Number} options.expireAfterSeconds - Optional, if set this index becomes a TTL index (only works on Date fields, not arrays of Date)
    * @param {Function} cb Optional callback, signature: err
-   * FIXME: promise support
    */
   public ensureIndex(options: IndexOptions, cb?: CallbackOptionalError) {
-    let err;
-    const callback = cb || function () {};
+    const promise = new Promise<void>((resolve, reject) => {
+      let err;
 
-    if (!options.fieldName) {
-      err = new Error('Cannot create an index without a fieldName');
-      // @ts-ignore
-      err.missingFieldName = true;
-      return callback(err);
-    }
-    if (this.indexes[options.fieldName]) {
-      return callback(null);
-    }
-
-    this.indexes[options.fieldName] = options.hash ? new HashIndex(options) : new Index(options);
-    if (options.expireAfterSeconds !== undefined) {
-      this.ttlIndexes[options.fieldName] = options.expireAfterSeconds;
-    } // With this implementation index creation is not necessary to ensure TTL but we stick with MongoDB's API here
-
-    try {
-      this.indexes[options.fieldName].insertMultipleDocs(this.getAllData());
-    } catch (e: any) {
-      delete this.indexes[options.fieldName];
-      return callback(e);
-    }
-
-    // We may want to force all options to be persisted including defaults, not just the ones passed the index creation function
-    this.persistence.persistNewState([{ $$indexCreated: options }], (err: any) => {
-      if (err) {
-        return callback(err);
+      if (!options.fieldName) {
+        err = new Error('Cannot create an index without a fieldName');
+        // @ts-ignore
+        err.missingFieldName = true;
+        return reject(err);
       }
-      return callback(null);
+      if (this.indexes[options.fieldName]) {
+        return resolve(null);
+      }
+
+      this.indexes[options.fieldName] = options.hash ? new HashIndex(options) : new Index(options);
+      if (options.expireAfterSeconds !== undefined) {
+        this.ttlIndexes[options.fieldName] = options.expireAfterSeconds;
+      } // With this implementation index creation is not necessary to ensure TTL but we stick with MongoDB's API here
+
+      try {
+        this.indexes[options.fieldName].insertMultipleDocs(this.getAllData());
+      } catch (e: any) {
+        delete this.indexes[options.fieldName];
+        return reject(e);
+      }
+
+      // We may want to force all options to be persisted including defaults, not just the ones passed the index creation function
+      this.persistence.persistNewState([{ $$indexCreated: options }], (err: any) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(null);
+      });
     });
+
+    return asCallback(promise, cb);
   }
 
   /**
    * Remove an index
    * @param {String} fieldName
    * @param {Function} cb Optional callback, signature: err
-   * FIXME: promise support
    */
   public removeIndex(fieldName: string, cb?: CallbackOptionalError) {
-    const callback = cb || function () {};
+    const promise = new Promise<void>((resolve, reject) => {
+      delete this.indexes[fieldName];
 
-    delete this.indexes[fieldName];
-
-    this.persistence.persistNewState([{ $$indexRemoved: fieldName }], (err: any) => {
-      if (err) {
-        return callback(err);
-      }
-      return callback(null);
+      this.persistence.persistNewState([{ $$indexRemoved: fieldName }], (err: any) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(null);
+      });
     });
+
+    return asCallback(promise, cb);
   }
 
   /**
@@ -578,7 +582,10 @@ export class DataStore<T = AnyObject> extends EventEmitter {
         return cb(err);
       }
 
-      return cb(null, docs);
+      return cb(
+        null,
+        docs.map((x) => model.deepCopy(x))
+      );
     });
 
     return cursor;
@@ -599,8 +606,6 @@ export class DataStore<T = AnyObject> extends EventEmitter {
       query = {};
     }
 
-    const args = Array.prototype.slice.call(arguments);
-    const userCb = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null;
     const cursor = new Cursor<T>(this, query, (err: any, docs: T[], cb: CallbackWithResult<number>): void => {
       if (err) {
         return cb(err);
@@ -644,17 +649,15 @@ export class DataStore<T = AnyObject> extends EventEmitter {
 
     const cursor = new Cursor<T>(this, query, (err: any, docs: T[], cb: CallbackWithResult<Row<T>[]>) => {
       const res = [];
-      let i;
 
       if (err) {
         return cb(err);
       }
 
-      for (i = 0; i < docs.length; i++) {
-        res.push(model.deepCopy(docs[i]));
-      }
-
-      return cb(null, res);
+      return cb(
+        null,
+        docs.map((x) => model.deepCopy(x))
+      );
     });
 
     cursor.projection(projection as ProjectionQuery<T>);

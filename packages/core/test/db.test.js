@@ -1,5 +1,5 @@
 const should = require('chai').should();
-const { assert } = require('chai');
+const { assert, expect } = require('chai');
 
 const testDb = 'workspace/test.db';
 const fs = require('fs');
@@ -1025,6 +1025,39 @@ describe('Database', () => {
         });
       });
     });
+
+    it('Should always return copy on findOne', async () => {
+      await d.insert({ x: 2, hello: 'world' });
+
+      const doc = await d.findOne({ x: 2 });
+      assert.equal(doc.hello, 'world');
+      doc.hello = 'world2';
+
+      const again = await d.findOne({ x: 2 });
+      assert.equal(again.hello, 'world');
+    });
+
+    it('Should always return copy on find', async () => {
+      await d.insert({ x: 3, hello: 'world' });
+
+      const doc = await d.find({ x: 3 });
+      assert.equal(doc[0].hello, 'world');
+      doc[0].hello = 'world2';
+
+      const again = await d.find({ x: 3 });
+      assert.equal(again[0].hello, 'world');
+    });
+
+    it('Should always return copy on cursor', async () => {
+      await d.insert({ x: 3, hello: 'world' });
+
+      const doc = await d.cursor({ x: 3 }).exec();
+      assert.equal(doc[0].hello, 'world');
+      doc[0].hello = 'world2';
+
+      const again = await d.cursor({ x: 3 }).exec();
+      assert.equal(again[0].hello, 'world');
+    });
   }); // ==== End of 'Find' ==== //
 
   describe('Count', () => {
@@ -1667,7 +1700,7 @@ describe('Database', () => {
     });
 
     it('If a multi update fails on one document, previous updates should be rolled back', (done) => {
-      d.ensureIndex({ fieldName: 'a' });
+      d.ensureIndex({ fieldName: 'a' }).then(console.log);
       d.insert({ a: 4 }, (err, doc1) => {
         d.insert({ a: 5 }, (err, doc2) => {
           d.insert({ a: 'abc' }, (err, doc3) => {
