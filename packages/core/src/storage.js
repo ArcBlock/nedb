@@ -15,13 +15,29 @@ const path = require('path');
 
 const storage = {};
 
+const renameOnWindows = (oldFilename, newFilename, cb) => {
+  try {
+    fs.copyFileSync(oldFilename, newFilename);
+    fs.rmSync(oldFilename);
+    if (typeof cb === 'function') {
+      cb();
+    }
+  } catch (error) {
+    if (typeof cb === 'function') {
+      cb(error);
+    }
+  }
+};
+
 storage.exists = fs.exists;
-storage.rename = fs.rename;
 storage.writeFile = fs.writeFile;
 storage.unlink = fs.unlink;
 storage.appendFile = fs.appendFile;
 storage.readFile = fs.readFile;
 storage.mkdirp = mkdirp;
+
+// 在 Windows 下 fs.rename 会遇到权限问题，不过还没弄明白为什么
+storage.rename = process.platform === 'win32' ? renameOnWindows : fs.rename;
 
 /**
  * Explicit name ...
