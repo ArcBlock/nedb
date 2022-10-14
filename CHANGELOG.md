@@ -1,3 +1,7 @@
+## 2.0.5 (October 14, 2022)
+
+- fix permission problem when renmame database files on Windows
+
 ## 2.0.4 (September 09, 2022)
 
 - feat: support promise for ensureIndex and removeIndex
