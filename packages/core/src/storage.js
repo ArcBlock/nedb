@@ -16,17 +16,13 @@ const path = require('path');
 const storage = {};
 
 const renameOnWindows = (oldFilename, newFilename, cb) => {
-  try {
-    fs.copyFileSync(oldFilename, newFilename);
-    fs.rmSync(oldFilename);
-    if (typeof cb === 'function') {
-      cb();
+  fs.copyFile(oldFilename, newFilename, (err) => {
+    if (err != null) {
+      return cb(err);
     }
-  } catch (error) {
-    if (typeof cb === 'function') {
-      cb(error);
-    }
-  }
+
+    fs.rm(oldFilename, cb);
+  });
 };
 
 storage.exists = fs.exists;
