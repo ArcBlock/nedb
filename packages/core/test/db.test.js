@@ -1700,6 +1700,7 @@ describe('Database', () => {
     });
 
     it('If a multi update fails on one document, previous updates should be rolled back', (done) => {
+      // eslint-disable-next-line no-console
       d.ensureIndex({ fieldName: 'a' }).then(console.log);
       d.insert({ a: 4 }, (err, doc1) => {
         d.insert({ a: 5 }, (err, doc2) => {
