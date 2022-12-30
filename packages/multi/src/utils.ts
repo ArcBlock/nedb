@@ -1,3 +1,5 @@
+// @ts-ignore
+import serialize from 'serialize-javascript';
 import { CallbackWithResult } from '@nedb/core';
 
 export function endsWithCallback(args?: any[]): boolean {
@@ -9,3 +11,10 @@ export function execCursor(cursor: any, db: any, callback: CallbackWithResult<an
 
   return db.cursor(query).sort(sort).skip(skip).limit(limit).projection(projection).exec(callback);
 }
+
+export function deserialize(data: string): any {
+  // eslint-disable-next-line no-eval
+  return eval(`(${data})`);
+}
+
+export { serialize };

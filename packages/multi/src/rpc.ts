@@ -2,7 +2,7 @@
 import errio from 'errio';
 import asCallback from 'standard-as-callback';
 
-import { endsWithCallback } from './utils';
+import { endsWithCallback, serialize } from './utils';
 
 export function doRpc<T>(socket: any, options: any, method: string, args: any[]): PromiseLike<T> {
   while (args.length && typeof args[args.length - 1] === 'undefined') {
@@ -17,7 +17,7 @@ export function doRpc<T>(socket: any, options: any, method: string, args: any[])
   }
 
   const promise = new Promise<T>((resolve, reject) => {
-    socket.send(options, method, dataOnlyArgs, (err: any, result: any) => {
+    socket.send(options, method, dataOnlyArgs.map(serialize), (err: any, result: any) => {
       if (err) {
         reject(errio.parse(err));
       } else {

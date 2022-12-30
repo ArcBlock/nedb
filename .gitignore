@@ -17,3 +17,4 @@ coverage
 _test
 workspace
 .nyc_output
+packages/multi/example.db
