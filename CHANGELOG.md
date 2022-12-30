@@ -1,6 +1,10 @@
+## 2.0.6 (December 30, 2022)
+
+- feat: support regexp and functions when doRpc call
+
 ## 2.0.5 (October 14, 2022)
 
-- fix permission problem when renmame database files on Windows
+- fix permission problem when rename database files on Windows
 
 ## 2.0.4 (September 09, 2022)
 
