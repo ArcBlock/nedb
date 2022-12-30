@@ -14,7 +14,7 @@ test('calling loadDatabase', (t) => {
 
   t.test('for the first time', (st) => {
     const dbsMap = new Map();
-    const messagesHandler = handler.createHandler(dbsMap);
+    const messagesHandler = handler.createHandler(dbsMap, false);
 
     messagesHandler({ filename: 'file' }, 'loadDatabase', [], () => {
       st.ok(dbsMap.get('file'));
@@ -24,7 +24,7 @@ test('calling loadDatabase', (t) => {
 
   t.test('twice', (st) => {
     const dbsMap = new Map();
-    const messagesHandler = handler.createHandler(dbsMap);
+    const messagesHandler = handler.createHandler(dbsMap, false);
 
     messagesHandler({ filename: 'file' }, 'loadDatabase', [], () => {
       const db1 = dbsMap.get('file');
@@ -56,7 +56,7 @@ test('calling closeDatabase', (t) => {
 
   t.test('should work as expected', (st) => {
     const dbsMap = new Map();
-    const messagesHandler = handler.createHandler(dbsMap);
+    const messagesHandler = handler.createHandler(dbsMap, false);
 
     messagesHandler({ filename: 'file' }, 'loadDatabase', [], () => {
       const db1 = dbsMap.get('file');
@@ -95,7 +95,7 @@ test('calling other methods', (t) => {
     const dbsMap = new Map();
     dbsMap.set(filename, new DataStore());
 
-    const messagesHandler = handler.createHandler(dbsMap);
+    const messagesHandler = handler.createHandler(dbsMap, false);
 
     messagesHandler({ filename }, 'testMethod', [], (err, docs) => {
       st.notOk(err);
@@ -112,7 +112,7 @@ test('calling other methods', (t) => {
     });
 
     const dbsMap = new Map();
-    const messagesHandler = handler.createHandler(dbsMap);
+    const messagesHandler = handler.createHandler(dbsMap, false);
 
     messagesHandler({ filename }, 'testMethod', [], (err) => {
       st.ok(err);
@@ -135,7 +135,7 @@ test('executing a cursor', (t) => {
   const dbsMap = new Map();
   dbsMap.set('file', {});
 
-  const messagesHandler = handler.createHandler(dbsMap);
+  const messagesHandler = handler.createHandler(dbsMap, false);
 
   messagesHandler({ filename: 'file' }, '_nedb_multi_execCursor', [cursor], () => {
     t.end();

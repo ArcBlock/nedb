@@ -1,18 +1,37 @@
-const DataStore = require('../index')(Number(process.env.NEDB_MULTI_PORT));
+const crypto = require('crypto');
+const { createDataStore } = require('..');
+
+const DataStore = createDataStore(+process.env.NEDB_MULTI_PORT);
 
 const db = new DataStore({ filename: 'example.db' });
 const maxInsertsCount = 3;
 
+const uuid = () =>
+  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+
 db.loadDatabase(() => {
+  const start = Date.now();
   function next(insertsCount) {
     if (insertsCount === maxInsertsCount) {
-      process.exit(0);
+      db.find({ uid: { $regex: /^d/ } }, (err, docs) => {
+        console.log(err, docs);
+        console.log(Date.now() - start, 'ms');
+        process.exit(0);
+      });
+      // console.log(Date.now() - start, 'ms');
+      // process.exit(0);
     }
 
-    db.insert({ pid: process.pid }, (err) => {
+    const doc = { pid: process.pid, uid: uuid() };
+    db.insert(doc, (err) => {
       if (err) {
-        console.log('Insert error:', err); // eslint-disable-line no-console
+        console.log('Insert error:', err);
       } else {
+        console.log('Insert success:', doc);
         next(insertsCount + 1);
       }
     });

@@ -2,12 +2,13 @@ const test = require('tape'); // eslint-disable-line import/no-extraneous-depend
 const errio = require('errio');
 
 const { doRpc } = require('../../lib/rpc');
+const { deserialize } = require('../../lib/utils');
 
 test('without callback', (t) => {
   const args = [{}];
   const socket = {
     send(filename, method, dataOnlyArgs) {
-      t.deepEqual(dataOnlyArgs, args);
+      t.deepEqual(dataOnlyArgs.map(deserialize), args);
       t.end();
     },
   };
@@ -30,7 +31,7 @@ test('with callback', (t) => {
 
     const socket = {
       send(filename, method, dataOnlyArgs, callback) {
-        st.deepEqual(dataOnlyArgs, args.slice(0, 1));
+        st.deepEqual(dataOnlyArgs.map(deserialize), args.slice(0, 1));
         callback(null, socketReplyArg1);
       },
     };
@@ -51,7 +52,7 @@ test('with callback', (t) => {
     ];
     const socket = {
       send(filename, method, dataOnlyArgs, callback) {
-        st.deepEqual(dataOnlyArgs, args.slice(0, 1));
+        st.deepEqual(dataOnlyArgs.map(deserialize), args.slice(0, 1));
         callback(errio.stringify(new Error(errorMessage)));
       },
     };

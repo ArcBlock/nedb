@@ -40,6 +40,7 @@
     "@nedb/core": "2.0.5",
     "axon": "^2.0.3",
     "errio": "^1.2.2",
+    "serialize-javascript": "^6.0.0",
     "standard-as-callback": "^2.1.0"
   },
   "devDependencies": {

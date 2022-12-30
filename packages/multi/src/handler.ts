@@ -20,10 +20,12 @@ const replyCallback =
   };
 
 export const createHandler =
-  (map: Map<string, typeof DataStore>) =>
+  (map: Map<string, typeof DataStore>, serialized = true) =>
   (options: DataStoreOptions, method: string, dataOnlyArgs: any[], reply: CallbackWithResult<any>) => {
     const { filename = 'memory' } = options;
     let db = map.get(filename);
+
+    const decodedArgs = serialized ? dataOnlyArgs.map(utils.deserialize) : dataOnlyArgs;
 
     if (method === 'loadDatabase') {
       if (!db) {
@@ -39,12 +41,12 @@ export const createHandler =
     }
 
     if (method === constants.EXECUTE_CURSOR_PRIVATE) {
-      const cursor = dataOnlyArgs[dataOnlyArgs.length - 1];
+      const cursor = decodedArgs[decodedArgs.length - 1];
       utils.execCursor(cursor, db, replyCallback(reply));
     } else if (method === constants.PERSISTENCE_COMPACT_DATAFILE) {
       db.persistence.compactDatafile();
     } else if (method === constants.PERSISTENCE_SET_AUTO_COMPACTION_INTERVAL) {
-      db.persistence.setAutoCompactionInterval(...dataOnlyArgs);
+      db.persistence.setAutoCompactionInterval(...decodedArgs);
     } else if (method === constants.PERSISTENCE_STOP_AUTO_COMPACTION) {
       db.persistence.stopAutoCompaction();
     } else if (method === 'closeDatabase') {
@@ -55,7 +57,7 @@ export const createHandler =
       replyCallback(reply)(null);
 
       try {
-        db.closeDatabase(...dataOnlyArgs, (...args: any[]) => {
+        db.closeDatabase(...decodedArgs, (...args: any[]) => {
           if (args[0] === null) {
             console.log(`Close database ${filename}`);
           } else {
@@ -66,6 +68,6 @@ export const createHandler =
         console.error(`Failed to close database ${filename}`, err.message);
       }
     } else {
-      db[method].call(db, ...dataOnlyArgs, replyCallback(reply));
+      db[method].call(db, ...decodedArgs, replyCallback(reply));
     }
   };
