@@ -1,6 +1,6 @@
 {
   "name": "@nedb/binary-search-tree",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "files": [
     "lib",
     "index.js"
