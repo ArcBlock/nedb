@@ -20,9 +20,14 @@ const replyCallback =
   };
 
 export const createHandler =
-  (map: Map<string, typeof DataStore>, serialized = true) =>
-  (options: DataStoreOptions, method: string, dataOnlyArgs: any[], reply: CallbackWithResult<any>) => {
-    const { filename = 'memory' } = options;
+  (map: Map<string, typeof DataStore>) =>
+  (
+    options: DataStoreOptions & { serialized: boolean },
+    method: string,
+    dataOnlyArgs: any[],
+    reply: CallbackWithResult<any>
+  ) => {
+    const { filename = 'memory', serialized = false } = options;
     let db = map.get(filename);
 
     const decodedArgs = serialized ? dataOnlyArgs.map(utils.deserialize) : dataOnlyArgs;

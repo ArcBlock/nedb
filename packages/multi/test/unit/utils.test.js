@@ -28,3 +28,25 @@ test('endsWithCallback', (t) => {
     st.end();
   });
 });
+
+test('serialize & deserialize', (t) => {
+  t.test('with primary types', (st) => {
+    const arg = {
+      string: 'string',
+      number: 1234,
+      date: new Date(),
+      regexp: /value/,
+      fn: () => 'value',
+    };
+
+    const serialized = utils.serialize(arg);
+    const deserialized = utils.deserialize(serialized);
+
+    st.equal(arg.string, deserialized.string);
+    st.equal(arg.number, deserialized.number);
+    st.equal(arg.date.toString(), deserialized.date.toString());
+    st.equal(arg.regexp.toString(), deserialized.regexp.toString());
+    st.equal(arg.fn.toString(), deserialized.fn.toString());
+    st.end();
+  });
+});

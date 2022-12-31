@@ -14,7 +14,7 @@ test('calling loadDatabase', (t) => {
 
   t.test('for the first time', (st) => {
     const dbsMap = new Map();
-    const messagesHandler = handler.createHandler(dbsMap, false);
+    const messagesHandler = handler.createHandler(dbsMap);
 
     messagesHandler({ filename: 'file' }, 'loadDatabase', [], () => {
       st.ok(dbsMap.get('file'));
@@ -24,7 +24,7 @@ test('calling loadDatabase', (t) => {
 
   t.test('twice', (st) => {
     const dbsMap = new Map();
-    const messagesHandler = handler.createHandler(dbsMap, false);
+    const messagesHandler = handler.createHandler(dbsMap);
 
     messagesHandler({ filename: 'file' }, 'loadDatabase', [], () => {
       const db1 = dbsMap.get('file');
@@ -56,7 +56,7 @@ test('calling closeDatabase', (t) => {
 
   t.test('should work as expected', (st) => {
     const dbsMap = new Map();
-    const messagesHandler = handler.createHandler(dbsMap, false);
+    const messagesHandler = handler.createHandler(dbsMap);
 
     messagesHandler({ filename: 'file' }, 'loadDatabase', [], () => {
       const db1 = dbsMap.get('file');
@@ -95,9 +95,36 @@ test('calling other methods', (t) => {
     const dbsMap = new Map();
     dbsMap.set(filename, new DataStore());
 
-    const messagesHandler = handler.createHandler(dbsMap, false);
+    const messagesHandler = handler.createHandler(dbsMap);
 
     messagesHandler({ filename }, 'testMethod', [], (err, docs) => {
+      st.notOk(err);
+      st.deepEqual(result, docs);
+      st.end();
+    });
+  });
+
+  t.test('when db has been loaded: serialized', (st) => {
+    const result = { key: 'value' };
+    const filename = 'file';
+
+    const DataStore = class {
+      testMethod(callback) {
+        // eslint-disable-line class-methods-use-this
+        process.nextTick(() => callback(null, result));
+      }
+    };
+
+    const handler = proxyquire('../../lib/handler', {
+      nedb: DataStore,
+    });
+
+    const dbsMap = new Map();
+    dbsMap.set(filename, new DataStore());
+
+    const messagesHandler = handler.createHandler(dbsMap);
+
+    messagesHandler({ filename, serialized: true }, 'testMethod', [], (err, docs) => {
       st.notOk(err);
       st.deepEqual(result, docs);
       st.end();
@@ -112,7 +139,7 @@ test('calling other methods', (t) => {
     });
 
     const dbsMap = new Map();
-    const messagesHandler = handler.createHandler(dbsMap, false);
+    const messagesHandler = handler.createHandler(dbsMap);
 
     messagesHandler({ filename }, 'testMethod', [], (err) => {
       st.ok(err);
@@ -135,7 +162,7 @@ test('executing a cursor', (t) => {
   const dbsMap = new Map();
   dbsMap.set('file', {});
 
-  const messagesHandler = handler.createHandler(dbsMap, false);
+  const messagesHandler = handler.createHandler(dbsMap);
 
   messagesHandler({ filename: 'file' }, '_nedb_multi_execCursor', [cursor], () => {
     t.end();

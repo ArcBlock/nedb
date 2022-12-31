@@ -26,9 +26,10 @@ export function createDataStore(socket: any) {
     readonly options: DataStoreOptions;
     readonly persistence: any;
 
-    constructor(options: any) {
-      this.options = options;
-      this.persistence = new PersistenceProxy(socket, options);
+    constructor(options: any = {}) {
+      const opts = Object.assign({ serialized: true }, options);
+      this.options = opts;
+      this.persistence = new PersistenceProxy(socket, opts);
     }
 
     public loadDatabase(): PromiseLike<void>;
