@@ -2,7 +2,7 @@ const { createDataStore } = require('..');
 
 const DataStore = createDataStore(+process.env.NEDB_MULTI_PORT);
 
-const db = new DataStore({ filename: 'example.db' });
+const db = new DataStore({ filename: 'example.db', serialized: false });
 const maxInsertsCount = 3;
 
 const uuid = () =>
@@ -16,13 +16,11 @@ db.loadDatabase(() => {
   const start = Date.now();
   function next(insertsCount) {
     if (insertsCount === maxInsertsCount) {
-      db.find({ uid: { $regex: /^d/ } }, (err, docs) => {
+      db.find({ pid: process.pid }, (err, docs) => {
         console.log(err, docs);
         console.log(Date.now() - start, 'ms');
         process.exit(0);
       });
-      // console.log(Date.now() - start, 'ms');
-      // process.exit(0);
     }
 
     const doc = { pid: process.pid, uid: uuid() };
