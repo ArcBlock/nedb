@@ -1,3 +1,7 @@
+## 2.0.7 (December 31, 2022)
+
+- fix: multi server should be backward compatible
+
 ## 2.0.6 (December 30, 2022)
 
 - feat: support regexp and functions when doRpc call
