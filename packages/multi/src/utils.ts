@@ -1,6 +1,7 @@
 // @ts-ignore
 import serialize from 'serialize-javascript';
 import { CallbackWithResult } from '@nedb/core';
+import crypto from 'crypto';
 
 export function endsWithCallback(args?: any[]): boolean {
   return args && args.length > 0 && typeof args[args.length - 1] === 'function';
@@ -18,3 +19,5 @@ export function deserialize(data: string): any {
 }
 
 export { serialize };
+
+export const md5 = (str: string): string => crypto.createHash('md5').update(str).digest('hex');
