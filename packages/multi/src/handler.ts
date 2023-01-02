@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/indent */
+import EventEmitter from 'events';
 import { CallbackWithResult, DataStoreOptions } from '@nedb/core';
 
 /* eslint-disable no-console */
@@ -7,6 +8,8 @@ const errio = require('errio');
 
 const utils = require('./utils');
 const constants = require('./constants');
+
+export const events = new EventEmitter();
 
 const replyCallback =
   (reply: CallbackWithResult<any>) =>
@@ -32,13 +35,19 @@ export const createHandler =
 
     const decodedArgs = serialized ? dataOnlyArgs.map(utils.deserialize) : dataOnlyArgs;
 
+    // NOTE: following code is only useful when test server recovery after crash when protected by daemon like PM2
+    // @see: example/crash.js
+    if (method === 'crash') {
+      throw new Error('server crashed');
+    }
     if (method === 'loadDatabase') {
       if (!db) {
-        console.log(`Create database ${filename}`);
+        console.log(`Load database ${filename}`);
         db = new DataStore(options);
         map.set(filename, db);
+        events.emit('loadDatabase', { dbPath: filename, options });
       } else {
-        console.log(`Use existed database ${filename}`);
+        console.log(`Use loaded database ${filename}`);
       }
     } else if (!db) {
       reply(errio.stringify(new Error('Call loadDatabase() first.')));
@@ -60,6 +69,8 @@ export const createHandler =
       // db.closeDatabase is not atomic
       map.delete(filename);
       replyCallback(reply)(null);
+
+      events.emit('closeDatabase', { dbPath: filename });
 
       try {
         db.closeDatabase(...decodedArgs, (...args: any[]) => {

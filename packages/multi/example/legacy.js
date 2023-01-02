@@ -2,7 +2,7 @@ const { createDataStore } = require('..');
 
 const DataStore = createDataStore(+process.env.NEDB_MULTI_PORT);
 
-const db = new DataStore({ filename: 'example.db', serialized: false });
+const db = new DataStore({ filename: 'legacy.db', serialized: false });
 const maxInsertsCount = 3;
 
 const uuid = () =>
