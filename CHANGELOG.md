@@ -1,3 +1,7 @@
+## 2.1.2 (January 02, 2023)
+
+- fix: ignore functions when serialize rpc params
+
 ## 2.1.1 (January 02, 2023)
 
 - fix: lock fs-extra to v10.x
