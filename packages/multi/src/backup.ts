@@ -28,13 +28,23 @@ export function createBackup(dataDir: string): Backup {
 
   const backupFile = path.join(dataDir, 'nedb-multi-backup.json');
   console.info('Using backup file', backupFile);
-  if (fs.existsSync(backupFile) === false) {
-    fs.writeJsonSync(backupFile, {});
-  }
 
   const recover: RecoverFn = () => fs.readJsonSync(backupFile);
   const load: LoadFn = (dbPath: string, options: any) => fs.writeJsonSync(backupFile, { ...recover(), [md5(dbPath)]: options }); // prettier-ignore
   const close: CloseFn = (dbPath: string) => fs.writeJsonSync(backupFile, omit(recover(), [md5(dbPath)]));
+
+  // make sure backup file exist
+  if (fs.existsSync(backupFile) === false) {
+    fs.writeJsonSync(backupFile, {});
+  } else {
+    // make sure backup file is valid json
+    try {
+      fs.readJsonSync(backupFile);
+    } catch (err) {
+      console.error('Reset backup file', err);
+      fs.writeJsonSync(backupFile, {});
+    }
+  }
 
   return {
     recover,
