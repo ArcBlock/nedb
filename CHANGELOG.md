@@ -1,3 +1,7 @@
+## 2.1.1 (January 02, 2023)
+
+- fix: lock fs-extra to v10.x
+
 ## 2.1.0 (January 02, 2023)
 
 - feat: make nedb multi server crash safe
