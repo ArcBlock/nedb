@@ -1,3 +1,7 @@
+## 2.1.0 (January 02, 2023)
+
+- feat: make nedb multi server crash safe
+
 ## 2.0.7 (December 31, 2022)
 
 - fix: multi server should be backward compatible
