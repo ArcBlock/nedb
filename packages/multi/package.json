@@ -40,7 +40,7 @@
     "@nedb/core": "2.1.0",
     "axon": "^2.0.3",
     "errio": "^1.2.2",
-    "fs-extra": "^11.1.0",
+    "fs-extra": "^10.1.0",
     "lodash.omit": "^4.5.0",
     "serialize-javascript": "^6.0.0",
     "standard-as-callback": "^2.1.0"
