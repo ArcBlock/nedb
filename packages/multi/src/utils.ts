@@ -1,5 +1,5 @@
 // @ts-ignore
-import serialize from 'serialize-javascript';
+import serializeJs from 'serialize-javascript';
 import { CallbackWithResult } from '@nedb/core';
 import crypto from 'crypto';
 
@@ -18,6 +18,8 @@ export function deserialize(data: string): any {
   return eval(`(${data})`);
 }
 
-export { serialize };
+export function serialize(data: any): string {
+  return serializeJs(data, { ignoreFunction: true });
+}
 
 export const md5 = (str: string): string => crypto.createHash('md5').update(str).digest('hex');
