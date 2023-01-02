@@ -37,9 +37,9 @@ export const createHandler =
 
     // NOTE: following code is only useful when test server recovery after crash when protected by daemon like PM2
     // @see: example/crash.js
-    if (method === 'crash') {
-      throw new Error('server crashed');
-    }
+    // if (method === 'crash') {
+    //   throw new Error('server crashed');
+    // }
     if (method === 'loadDatabase') {
       if (!db) {
         console.log(`Load database ${filename}`);
