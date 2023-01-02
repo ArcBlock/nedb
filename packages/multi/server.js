@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 const axon = require('axon');
-const path = require('path');
 
 const { createHandler, events } = require('./lib/handler');
 const { createBackup } = require('./lib/backup');
@@ -8,7 +7,7 @@ const { createBackup } = require('./lib/backup');
 const port = Number(process.env.NEDB_MULTI_PORT) || Number(process.argv[2]);
 
 const map = new Map();
-const dataDir = process.env.ABT_NODE_DATA_DIR ? path.join(process.env.ABT_NODE_DATA_DIR) : '';
+const dataDir = process.env.ABT_NODE_DATA_DIR ? process.env.ABT_NODE_DATA_DIR : '';
 const handler = createHandler(map);
 
 const backup = createBackup(dataDir);
