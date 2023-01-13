@@ -1,3 +1,7 @@
+## 2.1.3 (January 13, 2023)
+
+- fix: should throw error when insert with invalid arg
+
 ## 2.1.2 (January 02, 2023)
 
 - fix: ignore functions when serialize rpc params
