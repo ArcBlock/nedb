@@ -118,6 +118,24 @@ describe('Database', () => {
   });
 
   describe('Insert', () => {
+    it('shoudl throw when not valid document provided', (done) => {
+      d.insert(null, (err) => {
+        assert.isNotNull(err);
+        d.insert([], (err) => {
+          assert.isNotNull(err);
+          d.insert([null], (err) => {
+            assert.isNotNull(err);
+            d.insert([false], (err) => {
+              assert.isNotNull(err);
+              d.insert([[]], (err) => {
+                assert.isNotNull(err);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
     it('Able to insert a document in the database, setting an _id if none provided, and retrieve it even after a reload', (done) => {
       d.find({}, (err, docs) => {
         docs.length.should.equal(0);

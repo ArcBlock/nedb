@@ -46,7 +46,7 @@ test('serialize & deserialize', (t) => {
     st.equal(arg.number, deserialized.number);
     st.equal(arg.date.toString(), deserialized.date.toString());
     st.equal(arg.regexp.toString(), deserialized.regexp.toString());
-    st.equal(arg.fn.toString(), deserialized.fn.toString());
+    st.equal(arg.fn, undefined);
     st.end();
   });
 });

@@ -18,6 +18,9 @@
 import EventEmitter from 'events';
 import asCallback from 'standard-as-callback';
 
+// @ts-ignore
+import isPlainObject from 'lodash.isplainobject';
+
 /* eslint-disable func-names */
 const util = require('util');
 const AsyncWaterfall = require('async/waterfall');
@@ -468,6 +471,20 @@ export class DataStore<T = AnyObject> extends EventEmitter {
   private _insert(newDoc: any, cb?: any): void {
     const callback = cb || function () {};
     let preparedDoc: any;
+
+    if (!newDoc) {
+      return callback(new Error('No document provided to insert'));
+    }
+    if (Array.isArray(newDoc)) {
+      if (newDoc.length === 0) {
+        return callback(new Error('No document provided to insert'));
+      }
+      if (!newDoc.every(isPlainObject)) {
+        return callback(new Error('Expect new document to be object or array of objects'));
+      }
+    } else if (!isPlainObject(newDoc)) {
+      return callback(new Error('Expect new document to be object or array of objects'));
+    }
 
     try {
       preparedDoc = this.prepareDocumentForInsertion(newDoc);
