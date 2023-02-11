@@ -1,3 +1,7 @@
+## 2.1.5 (February 12, 2023)
+
+- fix: publish config
+
 ## 2.1.4 (February 11, 2023)
 
 - feat: add waterline adapter for nedb
