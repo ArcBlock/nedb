@@ -15,6 +15,7 @@
  */
 
 const util = require('util');
+const serializeJs = require('serialize-javascript');
 
 // eslint-disable-next-line global-require
 const debug = require('debug')(`${require('../package.json').name}:model`);
@@ -1046,7 +1047,7 @@ function accessor(obj, key) {
 }
 
 function _json(v) {
-  const r = JSON.stringify(v);
+  const r = serializeJs(v);
   if (r !== undefined) return r;
   throw new TypeError('unable to json');
 }
