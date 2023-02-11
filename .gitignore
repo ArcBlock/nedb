@@ -21,3 +21,4 @@ packages/multi/example.db
 example.db
 legacy.db
 nedb-multi-backup.json
+.tmp
