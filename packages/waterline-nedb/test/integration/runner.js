@@ -1,10 +1,11 @@
+// @ts-nocheck
+/* eslint-disable no-new */
 /* eslint-disable global-require */
 /* eslint-disable no-console */
 /**
  * Test runner dependencies
  */
 const util = require('util');
-const mocha = require('mocha');
 
 const TestRunner = require('waterline-adapter-tests');
 const Adapter = require('../..');
