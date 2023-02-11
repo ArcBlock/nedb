@@ -1,6 +1,6 @@
 {
   "name": "@nedb/waterline",
-  "version": "2.1.3",
+  "version": "2.1.5",
   "description": "NEDB adapter for Waterline",
   "main": "index.js",
   "publishConfig": {
@@ -30,8 +30,8 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "dependencies": {
-    "@nedb/core": "2.1.3",
-    "@nedb/multi": "2.1.3",
+    "@nedb/core": "2.1.5",
+    "@nedb/multi": "2.1.5",
     "async": "^3.2.4",
     "flaverr": "^1.10.0",
     "fs-extra": "^11.1.0",
