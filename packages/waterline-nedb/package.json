@@ -1,0 +1,49 @@
+{
+  "name": "@nedb/waterline",
+  "version": "2.1.3",
+  "description": "NEDB adapter for Waterline",
+  "main": "index.js",
+  "scripts": {
+    "precommit": "npm run test",
+    "prepush": "npm run test",
+    "lint": "eslint lib index.js",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "node test/integration/runner -R spec -b  || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arcblock/nedb.git"
+  },
+  "keywords": [
+    "adapter",
+    "nedb",
+    "waterline"
+  ],
+  "files": [
+    "lib",
+    "index.js"
+  ],
+  "author": "wangshijun <wangshijun2010@gmail.com>",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "@nedb/core": "2.1.3",
+    "@nedb/multi": "2.1.3",
+    "async": "^3.2.4",
+    "flaverr": "^1.10.0",
+    "fs-extra": "^11.1.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "waterline-adapter-tests": "1.0.1"
+  },
+  "sailsAdapter": {
+    "sailsVersion": "~1",
+    "implements": [
+      "semantic",
+      "queryable",
+      "associations"
+    ]
+  }
+}

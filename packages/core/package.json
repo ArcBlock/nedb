@@ -35,6 +35,7 @@
     "lodash.isplainobject": "^4.0.6",
     "mkdirp": "^1.0.4",
     "node-line-reader": "0.0.3",
+    "serialize-javascript": "^6.0.0",
     "standard-as-callback": "^2.1.0"
   },
   "devDependencies": {

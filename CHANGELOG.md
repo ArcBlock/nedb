@@ -1,3 +1,8 @@
+## 2.1.4 (February 11, 2023)
+
+- feat: add waterline adapter for nedb
+- fix: nested $regexp not working
+
 ## 2.1.3 (January 13, 2023)
 
 - fix: should throw error when insert with invalid arg
