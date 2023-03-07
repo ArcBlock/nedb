@@ -1,3 +1,6 @@
+## 2.1.6 (June 25, 2023)\n
+- fix: disable directory fsync on AIX and IBM i ("os400")
+
 ## 2.1.5 (February 12, 2023)
 
 - fix: publish config
