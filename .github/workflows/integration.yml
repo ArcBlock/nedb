@@ -37,18 +37,13 @@ jobs:
 
       - name: Init
         run: |
-          lerna bootstrap
-          lerna link
-          lerna run build
+          make github-init
 
       - name: Lint
-        run: npm run lint
-
-      - name: Build Typescript
-        run: npm run build
+        run: yarn lint
 
       - name: Run Tests
-        run: npm run test
+        run: yarn test
 
       - name: Report coverage
         uses: ArcBlock/code-coverage-assistant@v1.1.0

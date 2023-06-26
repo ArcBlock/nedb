@@ -15,8 +15,7 @@ install:
 
 dep:
 	@echo "Install dependencies required for this repo..."
-	@lerna bootstrap
-	@lerna link
+	@yarn
 	@npm run build
 
 include .makefiles/*.mk
